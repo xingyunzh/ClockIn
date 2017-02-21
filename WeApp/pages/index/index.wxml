@@ -1,10 +1,18 @@
 <!--index.wxml-->
 <view class="container">
   <view class="control-panel">
-    <view class="user-avatar">avatar</view>
+    <view class="user-avatar">
+      <image class="img-avatar" src="{{user.headImgUrl}}"></image>
+    </view>
     <view class="percentage">100%</view>
     <button bindtap="createEvent">发起准点到</button>
   </view>
-  <view class="list-panel">a</view>
+  <view class="list-panel">
+    <scroll-view scroll-top="{{scrollTop}}" scroll-y="true" style="height:{{scrollHeight}}px;" class="list" bindscrolltolower="bindDownLoad" bindscroll="scroll" bindscrolltoupper="refresh">
+      <view wx:for="{{events}}" wx:key="item">
+        {{item.description}}
+      </view>
+    </scroll-view>
+  </view>
   
 </view>

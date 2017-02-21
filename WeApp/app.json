@@ -1,6 +1,8 @@
 {
   "pages":[
     "pages/index/index",
+    "pages/event/event",
+    "pages/login/login",
     "pages/logs/logs"
   ],
   "window":{

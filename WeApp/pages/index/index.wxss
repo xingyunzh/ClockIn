@@ -8,3 +8,23 @@
   background: red;
   height: 100%;
 }
+
+.user-avatar{
+  float: left;
+  width: 50%;
+  height:70%;
+}
+
+.percentage{
+  width: 50%;
+  height: 70%;
+  float: left;
+}
+
+.img-avatar{
+  margin-top:30%;
+  margin-left: 30%;
+  width:30%;
+  height:30%;
+  background: black;
+}
