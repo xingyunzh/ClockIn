@@ -6,3 +6,7 @@
   justify-content: space-between;
   box-sizing: border-box;
 } 
+
+page {
+  height: 100%;
+}
