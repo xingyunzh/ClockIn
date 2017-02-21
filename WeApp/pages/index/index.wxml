@@ -1,8 +1,10 @@
 <!--index.wxml-->
 <view class="container">
-  <view  bindtap="bindViewTap" class="userinfo">
-    <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
-    <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+  <view class="control-panel">
+    <view class="user-avatar">avatar</view>
+    <view class="percentage">100%</view>
+    <button bindtap="createEvent">发起准点到</button>
   </view>
-  <button bindtap="createEvent">发起准点到</button>
+  <view class="list-panel">a</view>
+  
 </view>
