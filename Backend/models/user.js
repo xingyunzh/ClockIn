@@ -6,8 +6,12 @@ var userSchema = Schema({
 
 	uid:String,
 
-	headImgUrl:String
+	headImgUrl:String,
 
+	credits:{
+		type:Number,
+		default:0
+	}
 });
 
 var User = mongoose.model("User", userSchema);

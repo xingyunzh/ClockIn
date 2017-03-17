@@ -3,7 +3,9 @@ var Schema = mongoose.Schema;
 
 var eventSchema = Schema({
 
-	state:String, //preparing, finish, cancelled 
+	state:{
+		type:String,
+		default:'normal' //normal, cancelled
 
 	description:String,
 
@@ -19,18 +21,25 @@ var eventSchema = Schema({
 		default:new Date()
 	},
 
-	startTime:Date,
+	participations:[{
+		type:Schema.Types.ObjectId,
+		ref:'Participation'
+	}],
 
-	endTime:Date,
+	initialDeposit:{
+		type:Number,
+		default:0
+	},
 
-	longitude:String,
+	theTime:Date,
 
-	latitude:String,
+	longitude:Number,
+
+	latitude:Number,
 
 	checkInCode:String,
 
-	checkType:String
-	
+	checkType:String //'LBS','QR'
 });
 
 var Event = mongoose.model('Event', eventSchema);
