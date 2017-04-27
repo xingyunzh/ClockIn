@@ -6,6 +6,24 @@ App({
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
   },
+  setCredits:function(value){
+    var stringValue = '' + value
+    this.globalData.credits = parseInt(stringValue);
+
+    wx.setStorage({
+      key: 'credits',
+      data: stringValue,
+      success: function(res){
+        // success
+      },
+      fail: function(res) {
+        // fail
+      },
+      complete: function(res) {
+        // complete
+      }
+    })
+  },
   getUserInfo:function(cb){
     var that = this
     if(this.globalData.userInfo){
@@ -27,6 +45,7 @@ App({
     }
   },
   globalData:{
-    userInfo:null
+    userInfo:null,
+    credits:0
   }
 })

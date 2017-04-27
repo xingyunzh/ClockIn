@@ -3,12 +3,13 @@
     "pages/index/index",
     "pages/event/event",
     "pages/login/login",
+    "pages/newEvent/newEvent",
     "pages/logs/logs"
   ],
   "window":{
     "backgroundTextStyle":"light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "WeChat",
+    "navigationBarTitleText": "准点到哦",
     "navigationBarTextStyle":"black"
   }
 }

@@ -19,10 +19,10 @@ var contextRoot = "/";  //Not set any contextRoot at the moment, but let's make 
 
 mongoose.Promise = q.Promise;
 var envMongo = scr.getMongoEnv();
-var	mongoURL = 'mongodb://' + envMongo.user + 
-				":" + envMongo.password + 
-				'@' + envMongo.host + 
-				':' + envMongo.port + 
+var	mongoURL = 'mongodb://' + envMongo.user +
+				":" + envMongo.password +
+				'@' + envMongo.host +
+				':' + envMongo.port +
 				'/' + envMongo.db;
 
 
@@ -79,6 +79,7 @@ mongoose
 })
 .catch(function(err) {
 	console.log("Could not connect mongodb with error message "+ err);
+	console.log(mongoURL);
 });
 
 
@@ -141,4 +142,3 @@ function onListening() {
 		: 'port ' + addr.port;
 	console.log('Listening on ' + bind);
 }
-

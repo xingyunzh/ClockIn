@@ -6,7 +6,8 @@ var eventSchema = Schema({
 	state:{
 		type:String,
 		default:'normal' //normal, cancelled
-
+	},
+	
 	description:String,
 
 	creator:{

@@ -1,17 +1,29 @@
 <!--index.wxml-->
+<import src="/templates/eventCell/eventCell.wxml"/>
 <view class="container">
   <view class="control-panel">
     <view class="user-avatar">
-      <image class="img-avatar" src="{{user.headImgUrl}}"></image>
+      <image class="img-avatar" src="{{user.avatarUrl}}"></image>
     </view>
     <view class="percentage">100%</view>
-    <button bindtap="createEvent">发起准点到</button>
+    <view class="weui-btn-area">
+      <button type="primary" bindtap="createEvent">发起准点到</button>
+    </view>
+    
   </view>
   <view class="list-panel">
-    <scroll-view scroll-top="{{scrollTop}}" scroll-y="true" style="height:{{scrollHeight}}px;" class="list" bindscrolltolower="bindDownLoad" bindscroll="scroll" bindscrolltoupper="refresh">
-      <view wx:for="{{events}}" wx:key="item">
-        {{item.description}}
+    <scroll-view scroll-top="{{scrollTop}}" scroll-y="true" style="height:{{scrollHeight}}px;" class="list" bindscrolltolower="loadMore" bindscroll="scroll" bindscrolltoupper="refresh">
+      <view wx:if="{{events.length == 0}}">
+        <view class="weui-loadmore weui-loadmore_line">
+          <view class="weui-loadmore__tips weui-loadmore__tips_in-line">暂无数据</view>
+        </view>
       </view>
+      <view wx:else>
+        <view wx:for="{{events}}" wx:key="item" bindtap="viewEvent">
+          <template is="eventCell" data="{{...item}}"/>
+        </view>
+      </view>
+
     </scroll-view>
   </view>
   

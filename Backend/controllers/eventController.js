@@ -1,7 +1,7 @@
 var eventRepository= require('../repositories/eventRepository');
 var userRepository = require('../repositories/userRepository');
 var participationRepository =require('../repositories/participationRepository');
-var util = require('../util/shared/util');
+var util = require('../util/util');
 var q = require('q');
 
 exports.createEvent = function(req,res){
@@ -45,6 +45,8 @@ exports.getRefund = function(req,res) {
 				break;
 			}
 		}
+
+		throw new Exception();
 	}).then(function(user){
 		res.send(util.wrapBody({user:user}));
 	}).catch(function(err){
@@ -172,7 +174,7 @@ var reCaculateRefundForEvent = function(event) {
 	for (p of event.participations) {
 
 		var promise = participationRepository.updateById(p._id,{
-			refund:losersDeposit * p.deposit / winnersDeposit;
+			refund:losersDeposit * p.deposit / winnersDeposit
 		});
 
 		promises.push(promise);

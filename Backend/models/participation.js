@@ -20,6 +20,6 @@ var participationSchema = Schema({
 	refund:Number
 });
 
-var User = mongoose.model("User", userSchema);
+var User = mongoose.model("Participation", participationSchema);
 
 module.exports = User;

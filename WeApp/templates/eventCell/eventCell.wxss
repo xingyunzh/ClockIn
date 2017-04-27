@@ -1,0 +1,15 @@
+.event-cell{
+    height: 100rpx;
+}
+
+.event-cell-left{
+    float: left;
+}
+
+.event-cell-right{
+    float: left;
+}
+
+.location, .time{
+    float:left;
+}

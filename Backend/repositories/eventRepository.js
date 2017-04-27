@@ -14,7 +14,7 @@ exports.count = function(conditions){
 
 exports.findById = function(id){
 	return Event.findById(id).populate({
-		path:'creator participations'.
+		path:'creator participations',
 		populate:{
 			path:'user'
 		}
@@ -28,7 +28,7 @@ exports.update = function(conditions,data){
 		new:true
 	})
 	.populate({
-		path:'creator participations'.
+		path:'creator participations',
 		populate:{
 			path:'user'
 		}
@@ -54,7 +54,7 @@ exports.query = function(options){
 	}
 
 	return repositoryUtil.paging(Event,conditions,options,{
-		path:'creator participations'.
+		path:'creator participations',
 		populate:{
 			path:'user'
 		}

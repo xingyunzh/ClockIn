@@ -1,0 +1,21 @@
+<template name="eventCell">
+    <view class="event-cell">
+        <view class="event-cell-left">
+            {{status}}
+        </view>
+        <view class="event-cell-right">
+            <view class="meta-data">
+                <view class="location">
+                    {{location}}
+                </view>
+                <view class="time">
+                    {{time}}
+                </view>
+            </view>
+            <view class="description">
+                {{description}}
+            </view>
+            
+        </view>        
+    </view>
+</template>
