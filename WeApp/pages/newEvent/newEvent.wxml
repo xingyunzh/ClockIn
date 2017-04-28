@@ -12,7 +12,7 @@
                     <view class="weui-label">啥事</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input catchtap="descriptionInput" class="weui-input" type="text" placeholder="就写一句话" id="description" />
+                    <input bindinput="descriptionInput" class="weui-input" type="text" placeholder="就写一句话" id="description" />
                 </view>
             </view>
             <view class="weui-cell weui-cell_input">

@@ -6,7 +6,7 @@ App({
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
   },
-  setCredits:function(value){
+  setCredits:function(value,callback){
     var stringValue = '' + value
     this.globalData.credits = parseInt(stringValue);
 
@@ -14,13 +14,7 @@ App({
       key: 'credits',
       data: stringValue,
       success: function(res){
-        // success
-      },
-      fail: function(res) {
-        // fail
-      },
-      complete: function(res) {
-        // complete
+        callback()
       }
     })
   },

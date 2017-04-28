@@ -1,7 +1,21 @@
 <template name="eventCell">
     <view class="event-cell">
         <view class="event-cell-left">
-            {{status}}
+            <view wx:if="{{status==0}}">
+                <view class="status status-inprogress">
+                    进行中
+                </view>
+            </view>
+            <view wx:elif="{{status==1}}">
+                <view class="status status-success">
+                    准点到了
+                </view>
+            </view>
+            <view wx:else="{{status==2}}">
+                <view class="status status-fail">
+                    失败
+                </view>
+            </view>
         </view>
         <view class="event-cell-right">
             <view class="meta-data">

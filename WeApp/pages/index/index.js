@@ -5,6 +5,7 @@ var app = getApp()
 Page({
   data: {
     user:{},
+    credits:0,
     scrollTop : 0,
     scrollHeight:0,
     events:[]
@@ -19,7 +20,6 @@ Page({
     //调用应用实例的方法获取全局数据
     app.getUserInfo(function(userInfo){
       //更新数据
-      console.log(userInfo);
       that.setData({
         user:userInfo
       })
@@ -49,6 +49,16 @@ Page({
       }
     })
   },
+  viewEvent:function(event){
+    var id = event.currentTarget.dataset.id
+
+    wx.navigateTo({
+      url: '/pages/event/event?id=' + id,
+      success: function(res){
+        // success
+      }
+    })
+  },
   scroll:function(){
 
   },
@@ -56,32 +66,26 @@ Page({
   refresh:function(){
     console.log('refresh')
     var that = this
-    wx.getStorage({
-      key: 'events',
-      success: function(res){
-        // success
-        that.setData({
-          events:res.data
-        })
-      },
-      fail: function(res) {
-        // fail
-      },
-      complete: function(res) {
-        // complete
-      }
-    })
+    
 
     wx.getStorage({
       key: 'credits',
       success: function(res){
-        app.setCredits(res.data)
-      },
-      fail: function(res) {
-        // fail
-      },
-      complete: function(res) {
-        // complete
+        that.setData({
+          credits:res.data
+        })
+
+        app.setCredits(res.data,function(){
+          wx.getStorage({
+            key: 'events',
+            success: function(res){
+              // success
+              that.setData({
+                events:res.data
+              })
+            }
+          })
+        })
       }
     })
   },

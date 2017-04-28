@@ -1,15 +1,59 @@
 .event-cell{
-    height: 100rpx;
+    height: 140rpx;
+    padding-left: 50rpx;
+    padding-right: 50rpx;
 }
 
 .event-cell-left{
     float: left;
+    width: 150rpx;
 }
 
 .event-cell-right{
     float: left;
+    width: 500rpx;
 }
 
-.location, .time{
+.meta-data{
+    height: 70rpx;
+}
+
+.location{
+    line-height:70rpx;   
+    overflow:hidden; 
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    max-width: 220rpx;
     float:left;
+}
+
+.time{
+    float:right;
+    line-height:70rpx;   
+    overflow:hidden; 
+}
+
+.description{
+    line-height:70rpx;   
+    overflow:hidden; 
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    max-width: 450rpx;
+}
+
+.status{
+    line-height:140rpx;   
+    overflow:hidden; 
+}
+
+.status-inprogress{
+    color: deepskyblue;
+}
+
+.status-success{
+    color: palegreen;
+}
+
+.status-fail{
+    color: red;
 }

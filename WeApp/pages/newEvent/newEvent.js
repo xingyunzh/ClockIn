@@ -3,6 +3,7 @@ var util = require('../../utils/util')
 
 Page({
     data:{
+        description:"",
         location:"",
         date:"2017-01-01",
         time:"00:00",
@@ -58,9 +59,12 @@ Page({
             description:this.data.description,
             deposit:this.data.deposit
         }
-        util.createEvent(event,function(){
-            wx.navigateBack()
-        })
+        app.setCredits(this.data.credits - this.data.deposit,function(){
+            util.createEvent(event,function(){
+                wx.navigateBack()
+            })
+        });
+        
     },
     showTopTips: function(){
         var that = this;

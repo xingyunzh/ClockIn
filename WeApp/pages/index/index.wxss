@@ -1,9 +1,14 @@
 /**index.wxss**/
 .control-panel {
-  height:30%;
+  height:20%;
+}
+
+.info-panel{
+  height: 40%;
 }
 
 .list-panel {
+  margin-top:10%;
   height: 70%;
 }
 
@@ -13,15 +18,23 @@
   height:70%;
 }
 
-.percentage{
-  width: 50%;
-  height: 70%;
+.credits-area{
+  width: 160rpx;
+  margin-top: 50rpx;
+  margin-right: 50rpx;
+  float: right;
+}
+
+.credits-label{
   float: left;
 }
 
+.credits{
+  float: right;
+}
+
 .img-avatar{
-  margin-top:20%;
-  margin-left: 20%;
+  margin: 50rpx;
   width:55rpx;
   height:55rpx;
 }

@@ -1,0 +1,13 @@
+
+
+.map-area{
+    margin-right: auto;
+    margin-left: auto;
+    width:500rpx;
+    height: 500rpx;
+}
+
+.map{
+    width: 100%;
+    height: 100%;
+}

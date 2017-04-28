@@ -36,16 +36,6 @@ function dataInit(){
 
   if(storageInfo.keys.indexOf('events') < 0){
     var events = []
-    // for(var i = 0; i< 3;i++){
-    //   events.push({
-    //     id:uuidv1(),
-    //     description:'a',
-    //     location:'b',
-    //     time:formatTime(new Date()),
-    //     status:1
-    //   })
-    // }
-
     wx.setStorage({
       key: 'events',
       data: events,
@@ -89,11 +79,65 @@ function createEvent(event,callback){
 }
 
 function getEventList(options,callback){
+  wx.getStorage({
+    key: 'events',
+    success: function(res){
+      callback(res.data)
+    },
+    fail: function(res) {
+      // fail
+    },
+    complete: function(res) {
+      // complete
+    }
+  })
+}
 
+function getEventById(id,callback){
+  wx.getStorage({
+    key: 'events',
+    success: function(res){
+      var events = res.data
+      for(var event of events){
+        if(event.id == id){
+          callback(event)
+          break;
+        }
+      }
+    },
+    fail: function(res) {
+      // fail
+    },
+    complete: function(res) {
+      // complete
+    }
+  })
 }
 
 function updateEvent(id,updates,callback){
-
+  wx.getStorage({
+    key: 'events',
+    success: function(res){
+      var events = res.data
+      for(var event of events){
+        if(event.id == id){
+          var keys = Object.keys(updates)
+          for(var key of keys){
+            event[key] = updates[key]
+          }
+          break
+        }
+      }
+      wx.setStorage({
+        key: 'events',
+        data: events,
+        success: function(res){
+          // success
+          callback()
+        }
+      })
+    }
+  })
 }
 
 module.exports = {
@@ -102,5 +146,6 @@ module.exports = {
   dataInit:dataInit,
   createEvent:createEvent,
   getEventList:getEventList,
-  updateEvent:updateEvent
+  updateEvent:updateEvent,
+  getEventById:getEventById
 }
