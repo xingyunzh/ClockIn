@@ -1,12 +1,12 @@
 <view class="page">
     <view class="page__hd">
-        <view class="page__title">于{{event.time}}到达{{event.location}}</view>
+        <view class="page__title">应于{{event.time}}到达{{event.location}}</view>
         <view class="page__desc">{{event.description}}</view>
         
     </view>
     <view class="page__bd">
         <view class="map-area">
-            <map class="map" latitude="{{latitude}}" longitude="{{longitude}}" show-location="true"/>
+            <map class="map" latitude="{{latitude}}" longitude="{{longitude}}" show-location="{{event.status == 0}}" markers="{{markers}}"/>
         </view>
         <view wx:if="{{event.status==0}}">
             <view class="weui-btn-area">
@@ -15,10 +15,14 @@
             </view>
         </view>
         <view wx:elif="{{event.status==1}}">
-            准点到了
+            <view class="result result-success">
+                准点到达,获得{{event.deposit}}准点值
+            </view>
         </view>
         <view wx:else="{{event.status==2}}">
-            失败...
+            <view class="result result-fail">
+                未准点到,失去{{event.deposit}}准点值
+            </view>
         </view>
     </view>
 </view>

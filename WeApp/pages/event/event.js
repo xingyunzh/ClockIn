@@ -3,6 +3,7 @@ var util = require('../../utils/util')
 var app = getApp()
 Page({
     data:{
+        markers:[],
         event:{},
         latitude:0,
         longitude:0
@@ -13,8 +14,21 @@ Page({
             that.setData({
                 event:event
             })
+
+            if(event.status == 0){
+                this.showMyLocation()
+            }else{
+                that.setData({
+                    markers:[{
+                        latitude:event.latitude,
+                        longitude:event.longitude
+                    }],
+                    latitude:event.latitude,
+                    longitude:event.longitude
+              })
+            }
         })
-        this.showMyLocation()
+        
     },
     showMyLocation:function(){
         var that = this

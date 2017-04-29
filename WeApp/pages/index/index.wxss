@@ -5,11 +5,13 @@
 
 .info-panel{
   height: 40%;
+  margin-bottom: 50rpx;
 }
 
 .list-panel {
-  margin-top:10%;
-  height: 70%;
+  border-top:1rpx solid;
+  margin-top:5%;
+  height: 75%;
 }
 
 .user-avatar{

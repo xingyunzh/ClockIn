@@ -2,6 +2,8 @@
     height: 140rpx;
     padding-left: 50rpx;
     padding-right: 50rpx;
+    border-bottom-style:dotted;
+    border-bottom-width:1rpx; 
 }
 
 .event-cell-left{
@@ -51,7 +53,7 @@
 }
 
 .status-success{
-    color: palegreen;
+    color: lightgreen
 }
 
 .status-fail{

@@ -11,3 +11,20 @@
     width: 100%;
     height: 100%;
 }
+
+.result{
+    font-size: 1.5em;
+    text-align: center;
+    width: 500rpx;
+    margin-top: 100rpx;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.result-success{
+    color: lightgreen;
+}
+
+.result-fail{
+    color: red;
+}
