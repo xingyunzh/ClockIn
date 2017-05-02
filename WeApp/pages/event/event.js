@@ -16,7 +16,7 @@ Page({
             })
 
             if(event.status == 0){
-                this.showMyLocation()
+                that.showMyLocation()
             }else{
                 that.setData({
                     markers:[{
