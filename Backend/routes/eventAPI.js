@@ -4,7 +4,7 @@ var router = require('express').Router();
 
 router.post('/add',authenticator.authenticate,eventController.createEvent);
 
-router.get('/id/:id',eventController.getEventById);
+router.get('/id/:id',authenticator.authenticate,eventController.getEventById);
 
 router.get('/in/:id',authenticator.authenticate,eventController.clockIn);
 
