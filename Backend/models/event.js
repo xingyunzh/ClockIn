@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var moment = require('moment');
 
 var eventSchema = Schema({
 
@@ -20,7 +19,7 @@ var eventSchema = Schema({
 
 	createDate:{
 		type:Date,
-		default:moment()
+		default:new Date()
 	},
 
 	participations:[{

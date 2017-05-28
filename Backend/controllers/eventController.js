@@ -3,7 +3,6 @@ var userRepository = require('../repositories/userRepository');
 var participationRepository =require('../repositories/participationRepository');
 var util = require('../util/util');
 var q = require('q');
-var moment = require('moment');
 
 exports.createEvent = function(req,res){
 
@@ -128,7 +127,7 @@ exports.joinEvent = function(req,res){
 
 	eventRepository.findById(eventId)
 	.then(function checkEventState(event) {
-		if (event.theTime < moment()) {
+		if (event.theTime < new Date()) {
 			res.send(util.wrapBody('Event Expiried','E'));
 		}else {
 			return userRepository.updateById(userId,{
@@ -270,7 +269,7 @@ function checkEvents(events){
 
 	for (var event of events) {
 
-		if(event.state == 'in-progress' && event.theTime <= moment()){
+		if(event.state == 'in-progress' && event.theTime <= new Date(){
 			event.state = 'over'
 			promises.push(eventRepository.updateById(event._id,event));
 		}
