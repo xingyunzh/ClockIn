@@ -3,6 +3,10 @@
   height:20%;
 }
 
+.list{
+  height:100%
+}
+
 .info-panel{
   height: 40%;
   margin-bottom: 50rpx;

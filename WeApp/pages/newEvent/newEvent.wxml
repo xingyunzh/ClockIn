@@ -1,66 +1,57 @@
 <view class="page">
-    <view class="page__hd">
-        <view class="page__title">设置目标</view>
-        <view class="page__desc">在目标时间到达目标地点，可获得与投入准点值相应的奖励</view>
-    </view>
-    <view class="page__bd">
-        <view class="weui-toptips weui-toptips_warn" wx:if="{{shouldShowTopTips}}">{{errMsg}}</view>
-        <view class="weui-cells__title">请填入目标信息</view>
-        <view class="weui-cells weui-cells_after-title">
-            <view class="weui-cell weui-cell_input">
-                <view class="weui-cell__hd">
-                    <view class="weui-label">啥事</view>
-                </view>
-                <view class="weui-cell__bd">
-                    <input bindinput="descriptionInput" class="weui-input" type="text" placeholder="就写一句话" id="description" />
-                </view>
-            </view>
-            <view class="weui-cell weui-cell_input">
-                <view class="weui-cell__hd">
-                    <view class="weui-label {{shouldWarningTime?'weui-cell_warn':''}}">日期</view>
-                </view>
-                <view class="weui-cell__bd">
-                    <picker mode="date" bindchange="dateInput" value="{{date}}">
-                        <view class="weui-input">{{date}}</view>
-                    </picker>
-                </view>
-            </view>
-            <view class="weui-cell weui-cell_input">
-                <view class="weui-cell__hd {{shouldWarningTime?'weui-cell_warn':''}}">
-                    <view class="weui-label">时间</view>
-                </view>
-                <view class="weui-cell__bd">
-                    <picker mode="time" value="{{time}}" bindchange="timeInput">
-                    <view class="weui-input">{{time}}</view>
-                    </picker>
-                </view>
-            </view>
-            <view class="weui-cell weui-cell_input">
-                <view class="weui-cell__hd {{shouldWarningLocation?'weui-cell_warn':''}}">
-                    <view class="weui-label">地点</view>
-                </view>
-                <view class="weui-cell__bd">
-                    <input bindinput="locationInput" class="weui-input" placeholder="到哪儿" type="text"/>
-                </view>
-            </view>
-            <view class="weui-cell weui-cell_input">
-                <view class="weui-cell__hd {{shouldWarningDeposit?'weui-cell_warn':''}}">
-                    <view class="weui-label">准点值</view>
-                </view>
-                <view class="weui-cell__bd">
-                    <input bindinput="depositInput" class="weui-input" placeholder="可用准点值为 {{credits}}" type="number" confirm-type="done" />
-                </view>
-                <view wx:if="{{shouldWarningDeposit}}">
-                    <view class="weui-cell__ft">
-                        <icon type="warn" size="23" color="#E64340"></icon>
-                    </view>
-                </view>
-                
-            </view>
+  <view class="page__hd">
+    <view class="page__desc">信用可能是这世上最难获取，却又最易失去的东西了</view>
+  </view>
+  <view class="page__bd">
+    <view class="weui-toptips weui-toptips_warn" wx:if="{{shouldShowTopTips}}">{{errMsg}}</view>
+    <view class="weui-cells__title">请填入目标信息</view>
+    <view class="weui-cells weui-cells_after-title">
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label">啥事</view>
         </view>
-        <view class="weui-btn-area">
-            <button catchtap="submit" class="weui-btn" type="primary">确定</button>
+        <view class="weui-cell__bd">
+          <input bindinput="descriptionInput" class="weui-input" type="text" placeholder="就写一句话" id="description" />
         </view>
+      </view>
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label {{shouldWarningTime?'weui-cell_warn':''}}">哪天</view>
+        </view>
+        <view class="weui-cell__bd">
+          <picker mode="date" bindchange="dateInput" value="{{date}}">
+            <view class="weui-input">{{date}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd {{shouldWarningTime?'weui-cell_warn':''}}">
+          <view class="weui-label">几点</view>
+        </view>
+        <view class="weui-cell__bd">
+          <picker mode="time" value="{{time}}" bindchange="timeInput">
+            <view class="weui-input">{{time}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="location-area" hidden="{{location == null}}">
+        <view class="weui-cell map-area">
+          <map class="map" latitude="{{location.latitude}}" longitude="{{location.longitude}}" show-location="true" markers="{{markers}}" />
+        </view>
+        <view class="weui-cell">
+          <view class="text-address" catchtap="editLocation">
+            地址: {{location.address + ', ' + location.name}}
+          </view>
+        </view>
+
+      </view>
+      <view class="location-area" hidden="{{location != null}}">
+        <view class="btn-locate" catchtap="editLocation">定个位置</view>
+      </view>
     </view>
+    <view class="weui-btn-area">
+      <button catchtap="submit" class="weui-btn" type="primary">确定</button>
+    </view>
+  </view>
 
 </view>

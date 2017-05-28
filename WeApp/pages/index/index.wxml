@@ -1,23 +1,23 @@
 <!--index.wxml-->
-<import src="/templates/eventCell/eventCell.wxml"/>
+<import src="/templates/eventCell/eventCell.wxml" />
 <view class="container">
   <view class="control-panel">
     <view class="info-panel">
       <view class="user-avatar">
-        <image class="img-avatar" src="{{user.avatarUrl}}"></image>
+        <image class="img-avatar" src="{{userInfo.avatarUrl}}"></image>
       </view>
       <view class="credits-area">
-        <label class="credits-label">准点值</label>
-        <view class="credits">{{credits}}</view>
+        <label class="credits-label">准点</label>
+        <view class="credits">{{user.credits}}</view>
       </view>
     </view>
     <view class="weui-btn-area">
       <button type="primary" bindtap="createEvent">发起准点到</button>
     </view>
-    
+
   </view>
   <view class="list-panel">
-    <scroll-view scroll-top="{{scrollTop}}" scroll-y="true" style="height:100%" class="list" bindscrolltolower="loadMore" bindscroll="scroll" bindscrolltoupper="refresh">
+    <scroll-view scroll-top="{{scrollTop}}" scroll-y="true" class="list" bindscrolltolower="loadMore" bindscroll="scroll" bindscrolltoupper="refresh">
       <view wx:if="{{events.length == 0}}">
         <view class="weui-loadmore weui-loadmore_line">
           <view class="weui-loadmore__tips weui-loadmore__tips_in-line">暂无数据</view>
@@ -25,14 +25,14 @@
       </view>
       <view wx:else>
         <view wx:for="{{events}}" wx:key="item">
-          <view catchtap="viewEvent" data-id="{{item.id}}">
-            <template is="eventCell" data="{{...item}}"/>
+          <view catchtap="viewEvent" data-id="{{item._id}}">
+            <template is="eventCell" data="{{...item}}" />
           </view>
-          
+
         </view>
       </view>
 
     </scroll-view>
   </view>
-  
+
 </view>

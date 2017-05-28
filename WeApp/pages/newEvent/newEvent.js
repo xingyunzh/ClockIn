@@ -1,15 +1,14 @@
 var app = getApp()
 var util = require('../../utils/util')
+var network = require('../../utils/network')
 
 Page({
     data:{
         description:"",
-        location:"",
+        location:null,
+        markers:[],
         date:"2017-01-01",
         time:"00:00",
-        deposit:0,
-        credits:0,
-        shouldWarningDeposit:false,
         shouldWarningTime:false,
         shouldWarningLocation:false,
         errMsg:'',
@@ -56,15 +55,14 @@ Page({
         var event = {
             location:this.data.location,
             time:this.data.date + " " + this.data.time,
-            description:this.data.description,
-            deposit:this.data.deposit
         }
-        app.setCredits(this.data.credits - this.data.deposit,function(){
-            util.createEvent(event,function(){
-                wx.navigateBack()
-            })
-        });
         
+        network.createEvent(event,function(err){
+          wx.navigateBack({
+            delta:1
+          })
+          console.log('c e err:',err)
+        });
     },
     showTopTips: function(){
         var that = this;
@@ -78,11 +76,7 @@ Page({
         }, 3000);
     },
     isLocationValid:function(location){
-        if(location !== undefined){
-            return location.length > 0
-        }else{
-            return this.data.location.length > 0
-        }
+        return !!this.data.location
     },
     isTimeValid:function(){
         var theTime = new Date(this.data.date)
@@ -91,10 +85,25 @@ Page({
         console.log(theTime)
         return theTime > new Date()
     },
-    locationInput:function(event){
-        this.setData({
-            location:event.detail.value,
-            shouldWarningLocation:!this.isLocationValid(event.detail.value)
+    editLocation:function(event){
+        var that = this;
+        wx.chooseLocation({
+            success: function(res) {
+                console.log(res);
+                that.setData({
+                  location:{
+                    name:res.name,
+                    address:res.address,
+                    latitude:res.latitude,
+                    longitude:res.longitude
+                  },
+                  markers: [{
+                    latitude: res.latitude,
+                    longitude: res.longitude
+                  }],
+                  shouldWarningLocation:false
+                })
+            }
         })
     },
     dateInput:function(event){

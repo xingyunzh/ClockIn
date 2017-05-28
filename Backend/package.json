@@ -13,6 +13,7 @@
     "fs": "0.0.1-security",
     "jsonwebtoken": "^7.1.7",
     "lodash": "^4.17.0",
+    "moment": "^2.18.1",
     "mongoose": "^4.6.0",
     "morgan": "^1.7.0",
     "pinyin": "^2.8.0",

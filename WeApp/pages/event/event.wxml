@@ -1,28 +1,43 @@
+<import src="/templates/participationCell/participationCell.wxml" />
 <view class="page">
-    <view class="page__hd">
-        <view class="page__title">应于{{event.time}}到达{{event.location}}</view>
-        <view class="page__desc">{{event.description}}</view>
-        
+  <view class="target-area page__hd">
+    <view class="page__title">于{{displayTime}}到达{{event.location.name}}</view>
+    <view class="page__desc">{{event.description}}</view>
+
+  </view>
+  <view class="page__bd">
+    <view class="weui-cell map-area">
+      <map class="map" latitude="{{latitude}}" longitude="{{longitude}}" show-location="true" markers="{{markers}}" />
     </view>
-    <view class="page__bd">
-        <view class="map-area">
-            <map class="map" latitude="{{latitude}}" longitude="{{longitude}}" show-location="{{event.status == 0}}" markers="{{markers}}"/>
+    <view style='height:{{listHeight}}rpx' class="participation-area weui-cell">
+
+      <scroll-view class="list" scroll-y='true'>
+        <view wx:if="{{event.participations.length == 0}}">
+          <view class="weui-loadmore weui-loadmore_line">
+            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">还没有人说他会准点到哦</view>
+          </view>
         </view>
-        <view wx:if="{{event.status==0}}">
-            <view class="weui-btn-area">
-                <button catchtap="clockin" class="weui-btn" type="primary">准点到啦！</button>
-                <button catchtap="fail" class="weui-btn" type="warn">失败...</button>
-            </view>
+        <view wx:else>
+          <view wx:for="{{event.participations}}" wx:key="item">
+            <template is="participationCell" data="{{...item}}" />
+
+          </view>
         </view>
-        <view wx:elif="{{event.status==1}}">
-            <view class="result result-success">
-                准点到达,获得{{event.deposit}}准点值
-            </view>
-        </view>
-        <view wx:else="{{event.status==2}}">
-            <view class="result result-fail">
-                未准点到,失去{{event.deposit}}准点值
-            </view>
-        </view>
+      </scroll-view>
     </view>
+    <view class="control-area weui-cell">
+      <view class="weui-btn-area" wx:if="{{status == 0}}">
+        <button class="" type="primary" catchtap="joinEvent">加入</button>
+      </view>
+      <view class="weui-btn-area" wx:elif="{{status == 1}}">
+        <button type="default" catchtap="clockIn">到达</button>
+      </view>
+      <view wx:elif="{{status == 2}}">
+        准点到达！获得{{participation.refund}}准点！
+      </view>
+      <view wx:elif="{{status == 3}}">
+        你迟到了！失去{{participation.deposit}}准点！
+      </view>
+    </view>
+  </view>
 </view>

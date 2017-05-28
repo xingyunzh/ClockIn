@@ -4,7 +4,7 @@
 var fs = require('fs');
 var q = require('q');
 
-var cacheHere = null;
+var cacheHere = {};
 
 var KEYS_PATH = '/root/keys/clockinKeys.json';
 
@@ -31,7 +31,22 @@ exports.getMongoEnv = function(){
 }
 
 exports.getTokenSecret = function(){
-    var data = fs.readFileSync(KEYS_PATH, "utf8");
-    var jwt = JSON.parse(data).jwt;
-    return jwt;
-}
+
+    if ('jwt' in cacheHere) {
+        return q.fcall(function(){
+            return cacheHere.jwt;
+        });
+    }else{
+
+        return q.nfcall(fs.readFile, KEYS_PATH, "utf8").then(function(data){
+            cacheHere.jwt = JSON.parse(data).jwt;
+            return cacheHere.jwt;
+        });
+    }
+};
+
+// exports.getTokenSecret = function(){
+//     var data = fs.readFileSync(KEYS_PATH, "utf8");
+//     var jwt = JSON.parse(data).jwt;
+//     return jwt;
+// }

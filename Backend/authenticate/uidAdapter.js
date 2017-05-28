@@ -5,6 +5,23 @@ exports.loginByWechat = function(code,callback) {
 	postUID('/clduser/login/wechat',{'code':code},null,callback);
 }
 
+exports.registerByWeApp = function(app,sessionId,data,iv,callback) {
+	postUID('/clduser/login/weapp/register',{
+		'sessionId':sessionId,
+		'app':app,
+		'encryptedData':data,
+		'iv':iv
+	},null,callback);
+}
+
+exports.loginByWeApp = function(code,app,callback){
+	postUID('/clduser/login/weapp',{
+		'code':code,
+		'app':app
+	},null,callback);
+}
+
+
 exports.loginByEmail = function(email,password,callback){
 	postUID('/clduser/login/email',{email:email,password:password},null,callback);
 }
@@ -14,7 +31,7 @@ exports.getProfile = function(userId,callback){
 }
 
 var postUID = function(path,body,token,callback){
-	
+
 
 	var postData = JSON.stringify(body);
 	//console.log('postData',postData);
@@ -34,7 +51,7 @@ var postUID = function(path,body,token,callback){
 
 	var req = http.request(options, function(res){
 		res.setEncoding('utf8');
-		
+
 		res.on('data', function(chunk){
 
 		  	var resJSON = JSON.parse(chunk);
@@ -43,9 +60,9 @@ var postUID = function(path,body,token,callback){
 		  	}else{
 		  		callback(null,resJSON.body);
 		  	}
-		  	
+
 		});
-		  
+
 		res.on('end', function(){
 		    //console.log('No more data in response.');
 		});
@@ -60,8 +77,3 @@ var postUID = function(path,body,token,callback){
 	req.write(postData);
 	req.end();
 };
-
-
-
-
-

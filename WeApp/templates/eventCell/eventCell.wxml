@@ -1,29 +1,24 @@
 <template name="eventCell">
     <view class="event-cell">
         <view class="event-cell-left">
-            <view wx:if="{{status==0}}">
+            <view wx:if="{{state=='in-progress'}}">
                 <view class="status status-inprogress">
                     进行中
                 </view>
             </view>
-            <view wx:elif="{{status==1}}">
+            <view wx:elif="{{state=='over'}}">
                 <view class="status status-success">
-                    准点到了
-                </view>
-            </view>
-            <view wx:else="{{status==2}}">
-                <view class="status status-fail">
-                    失败
+                    结束了
                 </view>
             </view>
         </view>
         <view class="event-cell-right">
             <view class="meta-data">
                 <view class="location">
-                    {{location}}
+                    {{location.name}}
                 </view>
                 <view class="time">
-                    {{time}}
+                    {{displayCreateDate}}
                 </view>
             </view>
             <view class="description">

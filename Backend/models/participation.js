@@ -17,7 +17,10 @@ var participationSchema = Schema({
 
 	deposit:Number,
 
-	refund:Number
+	refund:{
+		type:Number,
+		default:0
+	}
 });
 
 var User = mongoose.model("Participation", participationSchema);

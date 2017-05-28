@@ -6,20 +6,114 @@ var authenticator = require('../authenticate/authenticator');
 var q = require('q');
 var CamproError = require('../models/CamproError');
 
-exports.loginByEmail = function(req,res){
 
-	if (!util.checkParam(req.body,['email','password'])) {
+exports.registerUserByWeApp = function(req,res){
+	if (!util.checkParam(req.body,['sessionId','encryptedData','iv'])) {
 		res.send(util.wrapBody('Invalid Parameter','E'));
 	}else{
-		login(req,res,'email');
-	}
-};
+		var deferred = q.defer();
+		uidAdapter.registerByWeApp('clockin',req.body.sessionId,req.body.encryptedData,req.body.iv,function(err,result){
+			if (err) {
+				deferred.reject(err);
+			}else{
+				deferred.resolve(result);
+			}
+		});
 
-exports.loginByWechat = function(req,res){
+		var user;
+
+		deferred.promise.then(function(result){
+			user = result.user;
+
+			var newUser = {
+				uid:user._id,
+				headImgUrl:user.headImgUrl,
+				nickname:user.nickname
+			};
+
+			return userRepository.create(newUser);
+		}).then(function generateToken(user){
+
+			return authenticator.create(user._id);
+		}).then(function sendResponse(token){
+			res.setHeader('set-token',token);
+
+			var responseBody = {
+				user:user
+			};
+
+			res.send(util.wrapBody(responseBody));
+		}).catch(function(err){
+			console.log(err);
+			res.send(util.wrapBody('Internal Error','E'));
+		});;
+	}
+}
+
+exports.loginByWeApp = function(req,res){
 	if (!util.checkParam(req.body,['code'])) {
 		res.send(util.wrapBody('Invalid Parameter','E'));
 	}else{
-		login(req,res,'wechat');
+		var code = req.body.code;
+
+		var deferred = q.defer();
+		uidAdapter.loginByWeApp(code,'clockin',function(err,result){
+			if (err) {
+				deferred.reject(err);
+			}else{
+				deferred.resolve(result);
+			}
+		});
+
+		deferred.promise.then(function(result){
+			console.log(result);
+
+			if(result.shouldGetPrivateUserInfo){
+				var responseBody = {
+					sessionId:result.sessionId,
+					shouldGetPrivateUserInfo:true
+				};
+
+				res.send(util.wrapBody(responseBody));
+
+			}else{
+				var user = result.user;
+				var u;
+
+				return userRepository
+				.findByUid(user._id)
+				.then(function(userResult){
+					if(userResult == null){
+
+						var newUser = {
+							uid:user._id,
+							headImgUrl:user.headImgUrl,
+							nickname:user.nickname
+						};
+
+						return userRepository.create(newUser);
+					}else{
+						return userResult;
+					}
+				}).then(function generateToken(user){
+					u = user;
+					console.log(u);
+					return authenticator.create(user._id);
+				}).then(function sendResponse(token){
+					res.setHeader('set-token',token);
+
+					var responseBody = {
+						user:u,
+					};
+
+					res.send(util.wrapBody(responseBody));
+				});
+			}
+		}).catch(function(err){
+			console.log(err);
+			res.send(util.wrapBody('Internal Error','E'));
+		});
+
 	}
 };
 
@@ -35,18 +129,32 @@ exports.update = function(req,res){
 };
 
 exports.getProfileById = function(req,res){
-	var id = req.params.id;
+	var userId = req.params.id;
 
-    userRepository.findById(id).then(function(result){
-        var responseBody = {
-            user:result
-        };
-        res.send(util.wrapBody(responseBody));
-    }).catch(function(err){
-        console.log(err);
-        res.send(util.wrapBody('Internal Error','E'));
-    });
+  userRepository.findById(id).then(function(result){
+      var responseBody = {
+          user:result
+      };
+      res.send(util.wrapBody(responseBody));
+  }).catch(function(err){
+      console.log(err);
+      res.send(util.wrapBody('Internal Error','E'));
+  });
 };
+
+exports.getProfile = function(req,res){
+	var userId = req.token.userId;
+
+	userRepository.findById(userId).then(function(result){
+			var responseBody = {
+					user:result
+			};
+			res.send(util.wrapBody(responseBody));
+	}).catch(function(err){
+			console.log(err);
+			res.send(util.wrapBody('Internal Error','E'));
+	});
+}
 
 exports.listUser = function(req,res){
 	var conditions = req.query;
@@ -85,7 +193,16 @@ function login(req,res,type){
 		});
 	}else if(type == 'wechat'){
 		var code = req.body.code;
-		uidAdapter.loginByWechat(code,function(err,result){
+		uidAdapter.loginByWechat(code,'clockin',function(err,result){
+			if (err) {
+				deferred.reject(err);
+			}else{
+				deferred.resolve(result);
+			}
+		});
+	}else if(type == 'weapp'){
+		var code = req.body.code;
+		uidAdapter.loginByWechat(code,'clockin',function(err,result){
 			if (err) {
 				deferred.reject(err);
 			}else{
@@ -140,12 +257,12 @@ function login(req,res,type){
 			}else{
 				res.setHeader('set-token',newToken);
 				deferred.resolve(user);
-			}				
+			}
 		});
 
 		return deferred.promise;
 	}).then(function sendResponse(user){
-		
+
 		var responseBody = {
 			user:user,
 			isFirstTimeLogin:isFirstTimeLogin
@@ -158,31 +275,3 @@ function login(req,res,type){
 	});
 
 }
-
-// function importProfile(user){
-
-// 	var imageName = stringHelper.randomString(10,['lower','digit']);
-
-// 	imageName = globalNameForFile(imageName,user);
-
-// 	return imageRepository
-// 	.getFromUrl(imageName,user.headImageUrl)
-// 	.then(function(tempPath){
-// 		return imageRepository.putToOSS(imageName,tempPath);
-// 	}).then(function(res){
-		
-// 		var newUser = {
-// 			uid:user._id,
-// 			headImageUrl:res.url
-// 		};
-
-// 		if (!!user.nickname) {
-// 			newUser.nickname = user.nickname;
-// 		} else {
-// 			newUser.nickname = '新用户' + stringHelper.generate(4,'all');
-// 		}
-
-// 		return userRepository.create(newUser);
-// 	});
-
-// }

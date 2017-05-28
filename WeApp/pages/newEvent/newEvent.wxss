@@ -1,0 +1,31 @@
+.map-area{
+  margin-right: auto;
+  margin-left: auto;
+  height: 300rpx;
+  padding-bottom: 20rpx;
+}
+
+.map{
+  width: 100%;
+  height: 100%;
+}
+
+.location-area{
+  width:100%;
+  min-height:150rpx;
+}
+
+.text-address{
+  color: blue;
+  font-size: 0.8em;
+  word-wrap: break-word;
+}
+
+.btn-locate{
+  color: blue;
+  text-align: center;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 50rpx;
+  width: 200rpx;
+}

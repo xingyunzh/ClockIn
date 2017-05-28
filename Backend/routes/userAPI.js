@@ -7,15 +7,9 @@ var router = require('express').Router();
 //		code:String
 //response:
 //{user:UserEntity}
-router.post('/login/wechat',userController.loginByWechat);
+router.post('/login/weapp',userController.loginByWeApp);
 
-//body parameters
-//	required:
-//		email:String
-//		password:String
-//response:
-//{user:UserEntity}
-router.post('/login/email',userController.loginByEmail);
+router.post('/login/weapp/register',userController.registerUserByWeApp);
 
 //path parameters
 //	required:
@@ -24,6 +18,8 @@ router.post('/login/email',userController.loginByEmail);
 //{user:UserEntity}
 router.get('/profile/:id',userController.getProfileById);
 
+
+router.get('/profile',userController.getProfile);
 //path parameters
 //	required:
 //		id:String (idea)

@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var userSchema = Schema({
-	name:String,
+	nickname:String,
 
 	uid:String,
 
@@ -10,7 +10,7 @@ var userSchema = Schema({
 
 	credits:{
 		type:Number,
-		default:0
+		default:206
 	}
 });
 

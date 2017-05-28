@@ -1,38 +1,77 @@
 //index.js
 //获取应用实例
 var util = require('../../utils/util')
+var network = require('../../utils/network')
 var app = getApp()
 Page({
   data: {
     user:{},
-    credits:0,
+    userInfo:{},
     scrollTop : 0,
     scrollHeight:0,
-    events:[]
+    events:[],
+    currentPage:0,
+    isLoadingData:true
   },
   onShow: function (){
-    this.refresh()
-  },
-  onLoad: function () {
-    console.log('onLoad')
     var that = this
-    util.dataInit();
     //调用应用实例的方法获取全局数据
-    app.getUserInfo(function(userInfo){
+    app.getUserInfo(function (userInfo) {
       //更新数据
+      console.log(userInfo)
       that.setData({
-        user:userInfo
+        userInfo: userInfo
       })
     })
 
-    wx.getSystemInfo({
-      success:function(res){
-        console.info(res.windowHeight);
-        that.setData({
-          scrollHeight:res.windowHeight * 0.6
-        });
+    this.init(function () {
+      network.getEvents(0, function (err, events) {
+        if (err) {
+          console.log(err)
+        } else {
+          that.setData({
+            events: events,
+            currentPage: 0
+          })
+        }
+      })
+    })
+  },
+  onLoad: function () {
+    console.log('onLoad')
+    
+  },
+  cacheUser:function(err,user,callback){
+    if (err) {
+      callback(err)
+    } else {
+      app.globalData.user = user
+      this.setData({
+        user:user
+      })
+      console.log(app.globalData)
+      callback(null)
+    }
+  },
+  init:function(callback){
+    var that  = this
+    wx.checkSession({
+      success:function(){
+        wx.getStorageInfo({
+          success: function(res) {
+            console.log(res)
+            if(res.keys.indexOf('token') > -1){
+              network.getCredit(that.cacheUser,callback)
+            }else{
+              network.login(that.cacheUser,callback)
+            }
+          },
+        })
+      },
+      fail:function(){
+        network.login(that.cacheUser,callback)
       }
-    });
+    })
   },
   //事件处理函数
   createEvent: function(event){
@@ -40,12 +79,6 @@ Page({
       url: '/pages/newEvent/newEvent',
       success: function(res){
         // success
-      },
-      fail: function(res) {
-        // fail
-      },
-      complete: function(res) {
-        // complete
       }
     })
   },
@@ -62,34 +95,29 @@ Page({
   scroll:function(){
 
   },
-
-  refresh:function(){
-    console.log('refresh')
-    var that = this
-    
-
-    wx.getStorage({
-      key: 'credits',
-      success: function(res){
-        that.setData({
-          credits:res.data
-        })
-
-        app.setCredits(res.data,function(){
-          wx.getStorage({
-            key: 'events',
-            success: function(res){
-              // success
-              that.setData({
-                events:res.data
-              })
-            }
-          })
-        })
-      }
-    })
-  },
   loadMore:function(){
     console.log('load more')
+    if(!this.data.isLoadingData){
+      var that = this
+      this.setData({
+        currentPage: this.data.currentPage + 1,
+        isLoadingMore: true
+      })
+      network.getEvents(this.data.currentPage, function (err, events) {
+        if (events.length == 0) {
+          console.log('no more')
+          that.setData({
+            currentPage: this.data.currentPage - 1,
+            isLoadingMore:false
+          })
+        } else {
+          that.setData({
+            events: that.data.events.concat(events),
+            isLoadingMore: false
+          })
+        }
+      })
+    }
+    
   }
 })

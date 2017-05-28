@@ -21,6 +21,20 @@ exports.findById = function(id){
 	}).lean().exec();
 };
 
+exports.updateById = function(id,data){
+	return Event.findByIdAndUpdate(id,data,{
+		new:true
+	})
+	.populate({
+		path:'creator participations',
+		populate:{
+			path:'user'
+		}
+	})
+	.lean()
+	.exec();
+}
+
 exports.update = function(conditions,data){
 
 	return Event
@@ -33,6 +47,7 @@ exports.update = function(conditions,data){
 			path:'user'
 		}
 	})
+	.lean()
 	.exec();
 };
 
@@ -44,6 +59,14 @@ exports.create = function(data){
 exports.query = function(options){
 
 	var conditions = {};
+
+	if('related' in options){
+		conditions.$or = [{
+			creator:options.related
+		},{
+			'participations.user':options.related
+		}]
+	}
 
 	if ('creator' in options) {
 		conditions.creator = options.creator;

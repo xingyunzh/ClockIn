@@ -1,13 +1,14 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var moment = require('moment');
 
 var eventSchema = Schema({
 
 	state:{
 		type:String,
-		default:'normal' //normal, cancelled
+		default:'in-progress' //normal, cancelled
 	},
-	
+
 	description:String,
 
 	creator:{
@@ -19,7 +20,7 @@ var eventSchema = Schema({
 
 	createDate:{
 		type:Date,
-		default:new Date()
+		default:moment()
 	},
 
 	participations:[{
@@ -34,13 +35,16 @@ var eventSchema = Schema({
 
 	theTime:Date,
 
-	longitude:Number,
+	location:{
+		address:String,
+		name:String,
+		longitude:Number,
+		latitude:Number,
+	}
 
-	latitude:Number,
+	// checkInCode:String,
 
-	checkInCode:String,
-
-	checkType:String //'LBS','QR'
+	// checkType:String //'LBS','QR'
 });
 
 var Event = mongoose.model('Event', eventSchema);

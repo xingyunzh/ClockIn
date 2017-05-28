@@ -3,31 +3,32 @@ var userRepository = require('../repositories/userRepository');
 var participationRepository =require('../repositories/participationRepository');
 var util = require('../util/util');
 var q = require('q');
+var moment = require('moment');
 
 exports.createEvent = function(req,res){
 
 	var userId = req.token.userId;
 
-	var event = req.body;
-
-	if(!util.checkParam(event,['checkType','theTime'])){
+	if(!util.checkParam(req.body,['location','time'])){
 		res.send(util.wrapBody('Invalid Parameters'),'E');
-		return;
+
+	}else{
+		var event = {
+			description:req.body.description,
+			location:req.body.location,
+			theTime:req.body.time,
+			creator : userId
+		}
+
+		eventRepository.create(event).then(function(result){
+			return eventRepository.findById(result._id);
+		}).then(function(newIdea){
+			res.send(util.wrapBody({event:newIdea}));
+		}).catch(function(err){
+			console.log(err);
+			res.send(util.wrapBody('Internal Error','E'));
+		});
 	}
-
-	event.creator = userId;
-	event.state = 'inProgress';
-	event.code = '1234';
-
-	eventRepository.create(event).then(function(result){
-		return eventRepostory.findById(result._id);
-	}).then(function(newIdea){
-		res.send(util.wrapBody({event:newIdea}));
-	}).catch(function(err){
-		console.log(err);
-		res.send(util.wrapBody('Internal Error','E'));
-	});
-
 };
 
 exports.getRefund = function(req,res) {
@@ -62,19 +63,14 @@ exports.getRefund = function(req,res) {
 exports.clockIn = function(req,res){
 	var userId = req.token.userId;
 	var eventId = req.params.id;
-	var code = req.params.code;
 
 	eventRepository.findById(eventId).then(function getEvent(event) {
-		if (code != '1234') {
-			res.send(util.wrapBody('Clock In Fail','E'));
-		}else {
-			for (p of event.participations) {
-				if (p.user._id == userId) {
-					return participationRepository.updateById(p._id,{
-						state:'clockedIn'
-					});
-					break;
-				}
+		for (p of event.participations) {
+			if (p.user._id == userId) {
+				return participationRepository.updateById(p._id,{
+					state:'clocked-in'
+				});
+				break;
 			}
 		}
 	}).then(function() {
@@ -130,23 +126,32 @@ exports.joinEvent = function(req,res){
 		deposit:deposit
 	};
 
-	eventRepository.findByid(eventId)
+	eventRepository.findById(eventId)
 	.then(function checkEventState(event) {
-		if (event.theTime < Date.now()) {
+		if (event.theTime < moment()) {
 			res.send(util.wrapBody('Event Expiried','E'));
 		}else {
-			return participationRepository.create(participation);
+			return userRepository.updateById(userId,{
+				$inc:{
+					credits: -deposit
+				}
+			}).then(function() {
+
+				return participationRepository.create(participation)
+
+			}).then(function addParticipationToEvent(newP) {
+				return eventRepository.updateById(eventId,{
+					$push:{
+						participations:newP._id
+					}
+				});
+			})
+			// .then(reCaculateRefundForEvent)
+			.then(function(result){
+				res.send(util.wrapBody({event:result}));
+			})
 		}
-	}).then(function addParticipationToEvent(participation) {
-		return eventRepository.updateById(eventId,{
-			$push:{
-				participations:participation._id
-			}
-		});
-	})
-	// .then(reCaculateRefundForEvent)
-	.then(function(result){
-		res.send(util.wrapBody({event:result}));
+
 	}).catch(function(err){
 		if (typeof err == String) {
 			res.send(util.wrapBody(err,'E'));
@@ -160,29 +165,44 @@ exports.joinEvent = function(req,res){
 var reCaculateRefundForEvent = function(event) {
 	var promises = [];
 
-	var losersDeposit = event.initialDeposit;
-	var winnersDeposit = event.initialDeposit;
+	var depositForRefund = event.initialDeposit;
+	var winnersDeposit = 0;
 
 	for (p of event.participations) {
 		if (p.state == 'normal') {
-			losersDeposit = losersDeposit + p.deposit;
-		}else if (p.state == 'clockedIn') {
+			depositForRefund = depositForRefund + p.deposit;
+		}else if (p.state == 'clocked-in') {
 			winnersDeposit = winnersDeposit + p.deposit;
 		}
 	}
 
-	for (p of event.participations) {
+	if(winnersDeposit == 0){
+		return eventRepository.findById(event._id);
+	}else{
+		for (p of event.participations) {
 
-		var promise = participationRepository.updateById(p._id,{
-			refund:losersDeposit * p.deposit / winnersDeposit
+			if (p.state == 'normal') {
+				var promise = participationRepository.updateById(p._id,{
+					refund:0
+				});
+			}else if (p.state == 'clocked-in') {
+				console.log(p.deposit)
+				console.log(depositForRefund)
+				console.log(winnersDeposit)
+				var promise = participationRepository.updateById(p._id,{
+					refund:depositForRefund * p.deposit / winnersDeposit
+				});
+			}
+
+
+			promises.push(promise);
+		}
+
+		return q.all(promises).then(function(){
+			return eventRepository.findById(event._id);
 		});
-
-		promises.push(promise);
 	}
 
-	return q.all(promises).then(function(){
-		return eventRepository.findById(event._id);
-	});
 }
 
 exports.updateEvent = function(req,res){
@@ -216,17 +236,24 @@ exports.updateEvent = function(req,res){
 exports.listEventsByUser = function(req,res){
 
 	var userId = req.token.userId;
+	var pageNum = req.query.pageNum;
 
-	var conditions = req.body;
-	conditions.user = req.token.userId;
-	conditions.sort = 'createDate';
-	conditions.pageSize = 100;
+	var conditions = {
+		related : req.token.userId,
+		sort : '-createDate',
+		pageSize : 10,
+		pageNum : pageNum
+	}
 
-	participationRepository.query(conditions).then(function(result){
-		res.send(util.wrapBody({
-			total:result.total,
-			events:result.list
-		}));
+
+	eventRepository.query(conditions).then(function(result){
+		return checkEvents(result.list).then(function(){
+			res.send(util.wrapBody({
+				total:result.total,
+				events:result.list
+			}));
+		});
+
 	}).catch(function(err){
 		if (typeof err == String) {
 			res.send(util.wrapBody(err,'E'));
@@ -235,25 +262,31 @@ exports.listEventsByUser = function(req,res){
 			res.send(util.wrapBody('Internal Error','E'));
 		}
 	});
-
 };
+
+function checkEvents(events){
+	var changedCount = 0;
+	var promises = [];
+
+	for (var event of events) {
+
+		if(event.state == 'in-progress' && event.theTime <= moment()){
+			event.state = 'over'
+			promises.push(eventRepository.updateById(event._id,event));
+		}
+	}
+
+	return q.all(promises);
+}
+
 
 exports.getEventById = function(req,res){
 	var eventId = req.params.id;
 
 	var event = {};
 
-	eventRepostory.findById(eventId).then(function(result){
-		event = result;
+	eventRepository.findById(eventId).then(function(event){
 
-		var conditions = {
-			event:result._id,
-			pageSize:100
-		};
-
-		return participationRepository.query(conditions);
-	}).then(function(result){
-		event.participants = result;
 		res.send(util.wrapBody({event:event}));
 
 	}).catch(function(err){

@@ -1,6 +1,37 @@
 var uuidv1 = require('../lib/uuid/we-uuidv1')
 
+function calculateDistance(loc1,loc2){
+
+    var dis = 0;
+    var radLat1 = toRad(loc1.latitude)
+    var radLat2 = toRad(loc2.latitude)
+    var deltaLat = radLat1 - radLat2 
+    var deltaLng = toRad(loc1.longitude) - toRad(loc2.longitude)
+    var dis = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(deltaLng / 2), 2)))
+    return dis * 6378137
+}
+
+function toRad(d) { return d * Math.PI / 180; }
+
+function formatDisplayDate(date){
+  if (typeof date == 'string'){
+    date = new Date(date)
+  }
+
+  var year = date.getFullYear()
+  var month = date.getMonth() + 1
+  var day = date.getDate()
+
+  return [year, month, day].map(formatNumber).join('/')
+}
+
 function formatTime(date) {
+  if (typeof date == 'string') {
+    date = new Date(date)
+  }
+
+  console.log(typeof date)
+
   var year = date.getFullYear()
   var month = date.getMonth() + 1
   var day = date.getDate()
@@ -8,7 +39,6 @@ function formatTime(date) {
   var hour = date.getHours()
   var minute = date.getMinutes()
   //var second = date.getSeconds()
-
 
   return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute].map(formatNumber).join(':')
 }
@@ -18,134 +48,10 @@ function formatNumber(n) {
   return n[1] ? n : '0' + n
 }
 
-function dataInit(){
-  var storageInfo = wx.getStorageInfoSync()
-  if(storageInfo.keys.indexOf('credits') < 0){
-    wx.setStorage({
-      key: 'credits',
-      data: "200",
-      success: function(res){
-        // success
-        console.log('credits init succeed')
-      },
-      fail:function(res){
-        console.log('credits init fail')
-      }
-    })
-  }
-
-  if(storageInfo.keys.indexOf('events') < 0){
-    var events = []
-    wx.setStorage({
-      key: 'events',
-      data: events,
-      success: function(res){
-        // success
-        console.log('events init succeed')
-      }
-    })
-  }
-}
-
-function createEvent(event,callback){
-  event.id = uuidv1()
-  event.status = 0
-
-  wx.getStorage({
-    key: 'events',
-    success: function(res){
-      var events = res.data;
-      events.push(event);
-      // success
-      wx.setStorage({
-        key: 'events',
-        data: events,
-        success: function(res){
-          // success
-        },
-        fail: function(res) {
-          // fail
-        },
-        complete:callback
-      })
-    },
-    fail: function(res) {
-      // fail
-    },
-    complete: function(res) {
-      // complete
-    }
-  })
-}
-
-function getEventList(options,callback){
-  wx.getStorage({
-    key: 'events',
-    success: function(res){
-      callback(res.data)
-    },
-    fail: function(res) {
-      // fail
-    },
-    complete: function(res) {
-      // complete
-    }
-  })
-}
-
-function getEventById(id,callback){
-  wx.getStorage({
-    key: 'events',
-    success: function(res){
-      var events = res.data
-      for(var event of events){
-        if(event.id == id){
-          callback(event)
-          break;
-        }
-      }
-    },
-    fail: function(res) {
-      // fail
-    },
-    complete: function(res) {
-      // complete
-    }
-  })
-}
-
-function updateEvent(id,updates,callback){
-  wx.getStorage({
-    key: 'events',
-    success: function(res){
-      var events = res.data
-      for(var event of events){
-        if(event.id == id){
-          var keys = Object.keys(updates)
-          for(var key of keys){
-            event[key] = updates[key]
-          }
-          break
-        }
-      }
-      wx.setStorage({
-        key: 'events',
-        data: events,
-        success: function(res){
-          // success
-          callback()
-        }
-      })
-    }
-  })
-}
 
 module.exports = {
+  formatDisplayDate: formatDisplayDate,
   formatTime: formatTime,
   formatTimeNumber: formatNumber,
-  dataInit:dataInit,
-  createEvent:createEvent,
-  getEventList:getEventList,
-  updateEvent:updateEvent,
-  getEventById:getEventById
+  calculateDistance: calculateDistance
 }

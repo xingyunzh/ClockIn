@@ -1,0 +1,19 @@
+<template name="participationCell">
+  <view class="participation-cell">
+    <view class="participation-avatar">
+      <image class="img-avatar" src="{{user.headImgUrl}}" />
+    </view>
+    <view class="participation-name">{{user.nickname}}</view>
+    
+    <view class="participation-state">
+      <view wx:if="{{state == 'normal'}}">
+        在路上。
+      </view>
+      <view wx:elif="{{state == 'clocked-in'}}">
+        Ta到了！
+      </view>
+    </view>
+    <view class="participation-deposit">{{deposit}}点</view>
+  </view>
+
+</template>
