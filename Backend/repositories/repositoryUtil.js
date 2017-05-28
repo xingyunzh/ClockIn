@@ -1,5 +1,4 @@
 var CamproError = require('../models/CamproError');
-var pinyin = require('pinyin');
 
 exports.buildSearchRegExp = function(string){
 	var alphabet = exports.alphabetize(string,{
