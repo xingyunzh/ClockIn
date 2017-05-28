@@ -269,7 +269,7 @@ function checkEvents(events){
 
 	for (var event of events) {
 
-		if(event.state == 'in-progress' && event.theTime <= new Date(){
+		if(event.state == 'in-progress' && event.theTime <= new Date()){
 			event.state = 'over'
 			promises.push(eventRepository.updateById(event._id,event));
 		}
