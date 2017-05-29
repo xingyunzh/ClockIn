@@ -13,8 +13,8 @@
 
       <scroll-view class="list" scroll-y='true'>
         <view wx:if="{{event.participations.length == 0}}">
-          <view class="weui-loadmore weui-loadmore_line">
-            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">还没有人说他会准点到哦</view>
+          <view class="weui-cell">
+            <view class="no-data">还没有人说他会准点到哦</view>
           </view>
         </view>
         <view wx:else>
@@ -40,6 +40,10 @@
       </view>
       <view wx:elif="{{status == 4}}">
         这次你没说你会不会准点到呢...
+      </view>
+      <view class="share-btn">
+        <button wx:if="{{shouldShowShareButton}}" open-type="share">分享</button>
+        <button wx:if="{{shouldUseShowShareButton}}" catchtap="shareEvent">分享</button>
       </view>
     </view>
   </view>
