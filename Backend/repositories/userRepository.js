@@ -10,9 +10,6 @@ exports.findById = function(id){
 };
 
 exports.create = function(data){
-	data.alphabetName = repositoryUtil.alphabetize(data.nickname,{
-		separator:'|'
-	});
 
 	return User.create(data);
 };
