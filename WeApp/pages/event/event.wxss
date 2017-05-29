@@ -6,7 +6,7 @@
 .map-area{
   margin-right: auto;
   margin-left: auto;
-  height: 400rpx;
+  height: 340rpx;
   padding-bottom: 20rpx;
 }
 
@@ -19,15 +19,18 @@
   height:70rpx;
 }
 
-.participation-area{
-  background: yellow;
+.share-btn{
+  float: right
 }
+
+/*.participation-area{
+
+}*/
 
 .control-area{
   padding-top: 10rpx;
   margin-top: 10rpx;
-  height: 100rpx;
-  background: cornflowerblue;
+  height: 80rpx;
 }
 
 .result{
@@ -37,12 +40,4 @@
     margin-top: 100rpx;
     margin-right: auto;
     margin-left: auto;
-}
-
-.result-success{
-    color: lightgreen;
-}
-
-.result-fail{
-    color: red;
 }

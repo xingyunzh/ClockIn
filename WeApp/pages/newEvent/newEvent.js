@@ -52,16 +52,15 @@ Page({
     },
     createEvent:function(){
         console.log('created');
-        var event = {
+        var newEvent = {
             location:this.data.location,
             time:this.data.date + " " + this.data.time,
         }
         
-        network.createEvent(event,function(err){
-          wx.navigateBack({
-            delta:1
+        network.createEvent(newEvent,function(err,event){
+          wx.redirectTo({
+            url: '/pages/event/event?id=' + event._id,
           })
-          console.log('c e err:',err)
         });
     },
     showTopTips: function(){

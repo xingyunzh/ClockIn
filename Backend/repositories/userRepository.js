@@ -30,10 +30,6 @@ exports.query = function(options){
 
 	var conditions = {};
 
-	if ('nickname' in options) {
-		conditions.alphabetName = repositoryUtil.buildSearchRegExp(options.nickname);
-	}
-
 	return repositoryUtil.paging(User,conditions,options,'');
 
 };

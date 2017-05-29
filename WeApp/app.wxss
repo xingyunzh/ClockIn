@@ -22,7 +22,7 @@ page{
     padding: 40rpx;
 }
 .page__bd {
-    padding-bottom: 80rpx;
+    padding-bottom: 40rpx;
 }
 .page__bd_spacing {
     padding-left: 15px;
@@ -45,4 +45,14 @@ page{
     color: #888888;
     text-align: left;
     font-size: 14px;
+}
+
+.no-data{
+  font-size: 14px;
+  color: #999999;
+  text-align: center;
+  padding: 0.9rpx;
+  width: 70%;
+  margin: 5rpx auto;
+  display: inline-block;
 }

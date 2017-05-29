@@ -1,5 +1,5 @@
 
-var baseUrl = 'http://localhost:8003';
+var baseUrl = 'https://www.camproz.com/clockin';
 var util = require('./util')
 
 
@@ -39,7 +39,7 @@ function createEvent(event,callback){
     data:event,
     success:function(res){
       console.log(res)
-      callback(null)
+      callback(null,res.data.body.event)
     }
     ,fail:function(err){
       callback(err)

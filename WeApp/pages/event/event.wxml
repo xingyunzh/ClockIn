@@ -38,6 +38,9 @@
       <view wx:elif="{{status == 3}}">
         你迟到了！失去{{participation.deposit}}准点！
       </view>
+      <view wx:elif="{{status == 4}}">
+        这次你没说你会不会准点到呢...
+      </view>
     </view>
   </view>
 </view>

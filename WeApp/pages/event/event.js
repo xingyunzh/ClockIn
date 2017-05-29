@@ -4,8 +4,30 @@ var network = require('../../utils/network')
 var app = getApp()
 var clockInDistance = 300;
 Page({
+  onShareAppMessage:function(){
+    return {
+      title: '我会准点到的，你呢？',
+      path: '/pages/event/event?id=' + this.data.event._id,
+      success: function (res) {
+        // 转发成功
+        console.log(res)
+        wx.showToast({
+          title: '分享成功',
+        })
+      },
+      fail: function (res) {
+        // 转发失败
+        wx.showToast({
+          title: '分享失败',
+        })
+      }
+    }
+  },
   data: {
+    shouldShowShareButton: wx.canIUse('button.open-type.share'),
+    shouldUseShowShareButton:!wx.canIUse('button.open-type.share')&&wx.canIUse(wx.showShareMenu),
     markers: [],
+    user:{},
     event: {},
     latitude: 0,
     longitude: 0,
@@ -14,15 +36,21 @@ Page({
     participation: {}
   },
   onShow: function () {
+
     var that = this
     wx.getSystemInfo({
       success: function (res) {
         console.log(res);
         that.setData({
-          listHeight: res.windowHeight / res.windowWidth * 750 - 150 - 420 - 110
+          listHeight: res.windowHeight / res.windowWidth * 750 - 150 - 320 - 110 - 80 - 60 - 10
         });
       }
     });
+  },
+  shareEvent:function(){
+    wx.showShareMenu({
+      withShareTicket:true
+    })
   },
   refreshData: function (event) {
     var status = -1
@@ -75,15 +103,26 @@ Page({
     }
   },
   onLoad: function (options) {
-
     var that = this
-    network.getEventById(options.id, function (err, event) {
-      if (err) {
+    app.init(function(err,user){
+      if(err){
         console.log(err)
-      } else {
-        that.refreshData(event);
+      }else{
+        that.setData({
+          user:user
+        })
+
+        network.getEventById(options.id, function (err, event) {
+          if (err) {
+            console.log(err)
+          } else {
+            that.refreshData(event);
+          }
+        })
       }
     })
+    
+    
   },
   showMyLocation: function () {
     var that = this
