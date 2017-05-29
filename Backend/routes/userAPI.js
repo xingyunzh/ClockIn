@@ -19,7 +19,7 @@ router.post('/login/weapp/register',userController.registerUserByWeApp);
 router.get('/profile/:id',userController.getProfileById);
 
 
-router.get('/profile',userController.getProfile);
+router.get('/profile',authenticator.authenticate,userController.getProfile);
 //path parameters
 //	required:
 //		id:String (idea)

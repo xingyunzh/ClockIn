@@ -20,26 +20,25 @@ exports.registerUserByWeApp = function(req,res){
 			}
 		});
 
-		var user;
+		var u;
 
 		deferred.promise.then(function(result){
-			user = result.user;
 
 			var newUser = {
-				uid:user._id,
-				headImgUrl:user.headImgUrl,
-				nickname:user.nickname
+				uid:result.user._id,
+				headImgUrl:result.user.headImgUrl,
+				nickname:result.user.nickname
 			};
 
 			return userRepository.create(newUser);
 		}).then(function generateToken(user){
-
+			u = user;
 			return authenticator.create(user._id);
 		}).then(function sendResponse(token){
 			res.setHeader('set-token',token);
 
 			var responseBody = {
-				user:user
+				user:u
 			};
 
 			res.send(util.wrapBody(responseBody));
