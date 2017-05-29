@@ -20,8 +20,12 @@
 
 .user-avatar{
   float: left;
-  width: 50%;
   height:70%;
+}
+
+.nickname-area{
+  margin-top: 50rpx;
+  float: left;
 }
 
 .credits-area{

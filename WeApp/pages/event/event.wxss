@@ -27,10 +27,22 @@
 
 }*/
 
+.control-area-left{
+  width:70%;
+  float: left;
+}
+
+.control-area-right{
+  width: 25%;
+  float: right;
+}
+
 .control-area{
-  padding-top: 10rpx;
+  padding-top: 30rpx;
   margin-top: 10rpx;
   height: 80rpx;
+  padding-right: 15px;
+  padding-left: 15px;
 }
 
 .result{

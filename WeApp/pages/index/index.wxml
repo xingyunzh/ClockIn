@@ -6,6 +6,9 @@
       <view class="user-avatar">
         <image class="img-avatar" src="{{userInfo.avatarUrl}}"></image>
       </view>
+      <view class="nickname-area">
+      {{userInfo.nickName}}
+      </view>
       <view class="credits-area">
         <label class="credits-label">准点</label>
         <view class="credits">{{user.credits}}</view>

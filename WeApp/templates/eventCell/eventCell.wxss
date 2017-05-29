@@ -1,61 +1,63 @@
-.event-cell{
-    height: 140rpx;
-    padding-left: 50rpx;
-    padding-right: 50rpx;
-    border-bottom-style:dotted;
-    border-bottom-width:1rpx; 
+.event-cell {
+  height: 140rpx;
+  padding-left: 50rpx;
+  padding-right: 50rpx;
+  border-bottom-style: dotted;
+  border-bottom-width: 1rpx;
 }
 
-.event-cell-left{
-    float: left;
-    width: 150rpx;
+.event-cell-left {
+  float: left;
+  width: 150rpx;
 }
 
-.event-cell-right{
-    float: left;
-    width: 500rpx;
+.event-cell-right {
+  float: left;
+  width: 500rpx;
 }
 
-.meta-data{
-    height: 70rpx;
+.meta-data {
+  height: 100%;
 }
 
-.location{
-    line-height:70rpx;   
-    overflow:hidden; 
-    text-overflow:ellipsis;
-    white-space: nowrap;
-    max-width: 220rpx;
-    float:left;
+.location {
+  line-height: 70rpx;
+  overflow: hidden;
+  /*text-overflow:ellipsis;*/
+  white-space: nowrap;
+  /*max-width: 220rpx;*/
+  text-align: right;
+  width: 100%;
 }
 
-.time{
-    float:right;
-    line-height:70rpx;   
-    overflow:hidden; 
+.time {
+  width: 100%;
+  text-align: right;
+  line-height: 70rpx;
+  overflow: hidden;
 }
 
-.description{
-    line-height:70rpx;   
-    overflow:hidden; 
-    text-overflow:ellipsis;
-    white-space: nowrap;
-    max-width: 450rpx;
+.description {
+  line-height: 70rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 450rpx;
 }
 
-.status{
-    line-height:140rpx;   
-    overflow:hidden; 
+.status {
+  line-height: 140rpx;
+  overflow: hidden;
 }
 
-.status-inprogress{
-    color: deepskyblue;
+.status-inprogress {
+  color: deepskyblue;
 }
 
-.status-success{
-    color: lightgreen
+.status-success {
+  color: lightgreen;
 }
 
-.status-fail{
-    color: red;
+.status-fail {
+  color: red;
 }
