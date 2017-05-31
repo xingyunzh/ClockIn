@@ -10,6 +10,12 @@
   padding-bottom: 20rpx;
 }
 
+.fixed_word{
+  margin-right: 10rpx;
+  margin-left: 10rpx;
+  font-size: 0.6em;
+}
+
 .map{
     width: 100%;
     height: 100%;
@@ -33,7 +39,7 @@
 }
 
 .control-area-right{
-  width: 25%;
+  width: 30%;
   float: right;
 }
 

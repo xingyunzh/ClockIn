@@ -5,20 +5,21 @@ var app = getApp()
 var clockInDistance = 300;
 Page({
   onShareAppMessage: function () {
+
     return {
-      title: '我会准点到的，你呢？',
+      title: this.data.event.creator.nickname + '邀请您准点到这来' + this.data.event.description,
       path: '/pages/event/event?id=' + this.data.event._id,
       success: function (res) {
         // 转发成功
         console.log(res)
         wx.showToast({
-          title: '分享成功',
+          title: '发送成功',
         })
       },
       fail: function (res) {
         // 转发失败
         wx.showToast({
-          title: '分享失败',
+          title: '发送失败',
         })
       }
     }

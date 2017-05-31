@@ -4,7 +4,7 @@
   <view class="control-panel">
     <view class="info-panel">
       <view class="user-avatar">
-        <image class="img-avatar" src="{{userInfo.avatarUrl}}"></image>
+        <image class="img-circle img-avatar" src="{{userInfo.avatarUrl}}"></image>
       </view>
       <view class="nickname-area">
       {{userInfo.nickName}}

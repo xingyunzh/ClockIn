@@ -1,7 +1,12 @@
 <import src="/templates/participationCell/participationCell.wxml" />
 <view class="page">
   <view class="target-area page__hd">
-    <view class="page__title">于{{displayTime}}到达{{event.location.name}}</view>
+    <view class="page__title">
+      <text>{{event.creator.nickname}}</text>
+      <text class="fixed_word">邀请您于</text>
+      <text>{{displayTime}}</text>
+      <text class="fixed_word">准时到达</text>
+      <text>{{event.location.name}}</text></view>
     <view class="page__desc">{{event.description}}</view>
 
   </view>
@@ -37,7 +42,7 @@
           您已到达！请稍等其他小伙伴。
         </view>
         <view wx:elif="{{status == 3}}">
-          恭喜！您准点到达！获得{{participation.refund}}准点！
+          恭喜！您准点到达！赢得{{participation.refund}}准点！
         </view>
         <view wx:elif="{{status == 4}}">
           您迟到了！失去{{participation.deposit}}准点！

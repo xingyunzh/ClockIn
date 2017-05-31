@@ -8,6 +8,7 @@
 }
 
 .info-panel{
+  line-height: 60rpx;
   height: 40%;
   margin-bottom: 50rpx;
 }
@@ -45,6 +46,6 @@
 
 .img-avatar{
   margin: 50rpx;
-  width:55rpx;
-  height:55rpx;
+  width:60rpx;
+  height:60rpx;
 }
