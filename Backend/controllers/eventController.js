@@ -1,6 +1,5 @@
 var eventRepository= require('../repositories/eventRepository');
 var userRepository = require('../repositories/userRepository');
-var participationRepository =require('../repositories/participationRepository');
 var util = require('../util/util');
 var q = require('q');
 
@@ -66,15 +65,15 @@ exports.clockIn = function(req,res){
 	eventRepository.findById(eventId).then(function getEvent(event) {
 		for (p of event.participations) {
 			if (p.user._id == userId) {
-				return participationRepository.updateById(p._id,{
-					state:'clocked-in'
+				p.state = 'clocked-in';
+				return eventRepository.updateById(eventId,{
+					participations:event.participations
 				});
 				break;
 			}
 		}
-	}).then(function() {
-		return eventRepository.findById(eventId).then(reCaculateRefundForEvent);
-	}).then(function(result){
+	}).then(reCaculateRefundForEvent)
+	.then(function(result){
 		res.send(util.wrapBody({event:result}));
 	}).catch(function(err){
 		if (typeof err == String) {
@@ -130,20 +129,17 @@ exports.joinEvent = function(req,res){
 		if (event.theTime < new Date()) {
 			res.send(util.wrapBody('Event Expiried','E'));
 		}else {
+
 			return userRepository.updateById(userId,{
 				$inc:{
 					credits: -deposit
 				}
 			}).then(function() {
-
-				return participationRepository.create(participation)
-
-			}).then(function addParticipationToEvent(newP) {
 				return eventRepository.updateById(eventId,{
 					$push:{
-						participations:newP._id
+						participations:participation
 					}
-				});
+				})
 			})
 			// .then(reCaculateRefundForEvent)
 			.then(function(result){
@@ -181,25 +177,17 @@ var reCaculateRefundForEvent = function(event) {
 		for (p of event.participations) {
 
 			if (p.state == 'normal') {
-				var promise = participationRepository.updateById(p._id,{
-					refund:0
-				});
+				p.refund = 0;
+
 			}else if (p.state == 'clocked-in') {
-				console.log(p.deposit)
-				console.log(depositForRefund)
-				console.log(winnersDeposit)
-				var promise = participationRepository.updateById(p._id,{
-					refund:depositForRefund * p.deposit / winnersDeposit
-				});
+				p.refund = depositForRefund * p.deposit / winnersDeposit
+
 			}
-
-
-			promises.push(promise);
 		}
 
-		return q.all(promises).then(function(){
-			return eventRepository.findById(event._id);
-		});
+		return eventRepository.update(event._id,{
+			participations:event.participations
+		})
 	}
 
 }

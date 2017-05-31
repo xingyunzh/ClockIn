@@ -13,24 +13,14 @@ exports.count = function(conditions){
 };
 
 exports.findById = function(id){
-	return Event.findById(id).populate({
-		path:'creator participations',
-		populate:{
-			path:'user'
-		}
-	}).lean().exec();
+	return Event.findById(id).populate('creator participations.user').lean().exec();
 };
 
 exports.updateById = function(id,data){
 	return Event.findByIdAndUpdate(id,data,{
 		new:true
 	})
-	.populate({
-		path:'creator participations',
-		populate:{
-			path:'user'
-		}
-	})
+	.populate('creator participations.user')
 	.lean()
 	.exec();
 }
@@ -41,12 +31,7 @@ exports.update = function(conditions,data){
 	.findOneAndUpdate(conditions,data,{
 		new:true
 	})
-	.populate({
-		path:'creator participations',
-		populate:{
-			path:'user'
-		}
-	})
+	.populate('creator participations.user')
 	.lean()
 	.exec();
 };
@@ -66,21 +51,13 @@ exports.query = function(options){
 		},{
 			'participations.user':options.related
 		}]
+
 	}
 
 	if ('creator' in options) {
 		conditions.creator = options.creator;
 	}
 
-	if ('participations' in options) {
-		conditions.participants = options.participants;
-	}
-
-	return repositoryUtil.paging(Event,conditions,options,{
-		path:'creator participations',
-		populate:{
-			path:'user'
-		}
-	});
+	return repositoryUtil.paging(Event,conditions,options,'creator participations.user');
 
 };

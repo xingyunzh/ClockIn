@@ -23,8 +23,19 @@ var eventSchema = Schema({
 	},
 
 	participations:[{
-		type:Schema.Types.ObjectId,
-		ref:'Participation'
+		user:{
+			type:Schema.Types.ObjectId,
+			ref:'User'
+		},
+
+		state:String,//normal, clockedIn
+
+		deposit:Number,
+
+		refund:{
+			type:Number,
+			default:0
+		}
 	}],
 
 	initialDeposit:{

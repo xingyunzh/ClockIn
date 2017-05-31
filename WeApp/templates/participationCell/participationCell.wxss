@@ -4,6 +4,8 @@
 }
 
 .participation-cell {
+  padding-top:5rpx;
+  padding-bottom: 5px;
   float: left;
   height: 60rpx;
   line-height: 60rpx;

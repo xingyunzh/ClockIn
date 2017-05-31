@@ -34,10 +34,10 @@
           <button type="primary" catchtap="clockIn">到达</button>
         </view>
         <view wx:elif="{{status == 2}}">
-          准点到达！获得{{participation.refund}}准点！
+          恭喜！您准点到达！获得{{participation.refund}}准点！
         </view>
         <view wx:elif="{{status == 3}}">
-          你迟到了！失去{{participation.deposit}}准点！
+          您迟到了！失去{{participation.deposit}}准点！
         </view>
         <view wx:elif="{{status == 4}}">
           这次你没说你会不会准点到呢...

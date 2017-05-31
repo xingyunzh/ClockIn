@@ -56,6 +56,7 @@ Page({
     var status = -1
     var tookPartIn = false
     for (var p of event.participations) {
+      console.log(p)
       if (p.user._id == app.globalData.user._id) {
         tookPartIn = true
         this.setData({
