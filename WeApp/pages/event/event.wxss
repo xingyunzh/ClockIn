@@ -6,7 +6,7 @@
 .map-area{
   margin-right: auto;
   margin-left: auto;
-  height: 340rpx;
+  height: 400rpx;
   padding-bottom: 20rpx;
 }
 

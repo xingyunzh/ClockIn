@@ -4,7 +4,7 @@ var network = require('../../utils/network')
 var app = getApp()
 var clockInDistance = 300;
 Page({
-  onShareAppMessage:function(){
+  onShareAppMessage: function () {
     return {
       title: '我会准点到的，你呢？',
       path: '/pages/event/event?id=' + this.data.event._id,
@@ -25,9 +25,9 @@ Page({
   },
   data: {
     shouldShowShareButton: wx.canIUse('button.open-type.share'),
-    shouldUseShowShareButton:!wx.canIUse('button.open-type.share')&&wx.canIUse(wx.showShareMenu),
+    shouldUseShowShareButton: !wx.canIUse('button.open-type.share') && wx.canIUse(wx.showShareMenu),
     markers: [],
-    user:{},
+    user: {},
     event: {},
     latitude: 0,
     longitude: 0,
@@ -42,21 +42,21 @@ Page({
       success: function (res) {
         console.log(res);
         that.setData({
-          listHeight: res.windowHeight / res.windowWidth * 750 - 150 - 320 - 110 - 80 - 60 - 10
+          listHeight: res.windowHeight / res.windowWidth * 750 - 150 - 420 - 120 - 40
         });
       }
     });
   },
-  shareEvent:function(){
+  shareEvent: function () {
     wx.showShareMenu({
-      withShareTicket:true
+      withShareTicket: true
     })
   },
   refreshData: function (event) {
     var status = -1
     var tookPartIn = false
     for (var p of event.participations) {
-      console.log(p)
+
       if (p.user._id == app.globalData.user._id) {
         tookPartIn = true
         this.setData({
@@ -68,19 +68,21 @@ Page({
 
     if (event.state == 'in-progress') {
       if (tookPartIn) {
-        status = 1
+        if (this.data.participation.state == 'clocked-in') {
+          status = 2
+        } else if (this.data.participation.state == 'normal') {
+          status = 1
+        }
       } else {
         status = 0
       }
     } else if (event.state == 'over') {
       if (tookPartIn) {
         if (this.data.participation.state == 'clocked-in') {
-          status = 2
-        } else if (this.data.participation.state == 'normal') {
           status = 3
+        } else if (this.data.participation.state == 'normal') {
+          status = 4
         }
-      } else {
-        status = 4
       }
     }
 
@@ -105,12 +107,12 @@ Page({
   },
   onLoad: function (options) {
     var that = this
-    app.init(function(err,user){
-      if(err){
+    app.init(function (err, user) {
+      if (err) {
         console.log(err)
-      }else{
+      } else {
         that.setData({
-          user:user
+          user: user
         })
 
         network.getEventById(options.id, function (err, event) {
@@ -122,8 +124,8 @@ Page({
         })
       }
     })
-    
-    
+
+
   },
   showMyLocation: function () {
     var that = this

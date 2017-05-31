@@ -55,7 +55,7 @@
 }
 
 .status-success {
-  color: lightgreen;
+  color: gray;
 }
 
 .status-fail {

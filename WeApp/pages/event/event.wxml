@@ -28,25 +28,25 @@
     <view class="control-area">
       <view class="control-area-left">
         <view  wx:if="{{status == 0}}">
-          <button class="" type="primary" catchtap="joinEvent">加入</button>
+          <button class="" type="primary" catchtap="joinEvent">接受邀请</button>
         </view>
         <view wx:elif="{{status == 1}}">
           <button type="primary" catchtap="clockIn">到达</button>
         </view>
         <view wx:elif="{{status == 2}}">
-          恭喜！您准点到达！获得{{participation.refund}}准点！
+          您已到达！请稍等其他小伙伴。
         </view>
         <view wx:elif="{{status == 3}}">
-          您迟到了！失去{{participation.deposit}}准点！
+          恭喜！您准点到达！获得{{participation.refund}}准点！
         </view>
         <view wx:elif="{{status == 4}}">
-          这次你没说你会不会准点到呢...
+          您迟到了！失去{{participation.deposit}}准点！
         </view>
       </view>
       <view class="control-area-right">
         <view >
-          <button class="share-btn" wx:if="{{shouldShowShareButton}}" open-type="share">分享</button>
-          <button class="share-btn" wx:if="{{shouldUseShowShareButton}}" catchtap="shareEvent">分享</button>
+          <button class="share-btn" wx:if="{{shouldShowShareButton}}" open-type="share">转发邀请</button>
+          <button class="share-btn" wx:if="{{shouldUseShowShareButton}}" catchtap="shareEvent">转发邀请</button>
         </view>
       </view>
     </view>
