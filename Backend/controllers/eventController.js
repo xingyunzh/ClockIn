@@ -1,11 +1,13 @@
 var eventRepository= require('../repositories/eventRepository');
 var userRepository = require('../repositories/userRepository');
+var CamproError = require('../models/CamproError');
 var util = require('../util/util');
 var q = require('q');
 
 exports.createEvent = function(req,res){
 
 	var userId = req.token.userId;
+	var deposit = req.body.deposit;
 
 	if(!util.checkParam(req.body,['location','time'])){
 		res.send(util.wrapBody('Invalid Parameters'),'E');
@@ -20,8 +22,10 @@ exports.createEvent = function(req,res){
 
 		eventRepository.create(event).then(function(result){
 			return eventRepository.findById(result._id);
-		}).then(function(newIdea){
-			res.send(util.wrapBody({event:newIdea}));
+		}).then(function(ne){
+			return join(ne._id,userId,deposit);
+		}).then(function(newEvent){
+			res.send(util.wrapBody({event:newEvent}));
 		}).catch(function(err){
 			console.log(err);
 			res.send(util.wrapBody('Internal Error','E'));
@@ -49,7 +53,7 @@ exports.getRefund = function(req,res) {
 	}).then(function(user){
 		res.send(util.wrapBody({user:user}));
 	}).catch(function(err){
-		if (typeof err == String) {
+		if (typeof err == 'CamproError') {
 			res.send(util.wrapBody(err,'E'));
 		} else {
 			console.log(err);
@@ -112,22 +116,18 @@ exports.cancelEvent = function(req,res){
 	});
 };
 
-exports.joinEvent = function(req,res){
-	var userId = req.token.userId;
-	var eventId = req.params.id;
-
-	var deposit = req.body.deposit;
-
+function join(eventId,userId,deposit){
 	var participation = {
 		user:userId,
 		state:'normal',
 		deposit:deposit
 	};
 
-	eventRepository.findById(eventId)
+	return eventRepository.findById(eventId)
 	.then(function checkEventState(event) {
 		if (event.theTime < new Date()) {
-			res.send(util.wrapBody('Event Expiried','E'));
+			throw new CamproError('Event Expiried');
+			// res.send(util.wrapBody('Event Expiried','E'));
 		}else {
 
 			return userRepository.updateById(userId,{
@@ -141,14 +141,21 @@ exports.joinEvent = function(req,res){
 					}
 				})
 			})
-			// .then(reCaculateRefundForEvent)
-			.then(function(result){
-				res.send(util.wrapBody({event:result}));
-			})
 		}
+	})
+}
 
+exports.joinEvent = function(req,res){
+	var userId = req.token.userId;
+	var eventId = req.params.id;
+
+	var deposit = req.body.deposit;
+
+	join(eventId,userId,deposit)
+	.then(function(result){
+		res.send(util.wrapBody({event:result}));
 	}).catch(function(err){
-		if (typeof err == String) {
+		if (typeof err == 'CamproError') {
 			res.send(util.wrapBody(err,'E'));
 		} else {
 			console.log(err);

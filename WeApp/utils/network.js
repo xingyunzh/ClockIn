@@ -1,5 +1,7 @@
 
 var baseUrl = 'https://www.camproz.com/clockin';
+// var baseUrl = 'http://localhost:8003';
+
 var util = require('./util')
 
 
