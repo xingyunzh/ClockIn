@@ -9,7 +9,7 @@ exports.createEvent = function(req,res){
 	var userId = req.token.userId;
 	var deposit = req.body.deposit;
 
-	if(!util.checkParam(req.body,['location','time'])){
+	if(!util.checkParam(req.body,['location','time','deposit'])){
 		res.send(util.wrapBody('Invalid Parameters'),'E');
 
 	}else{
