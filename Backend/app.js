@@ -12,13 +12,13 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var q = require('q');
 var router = require('./routes/router');
-var scr = require('./repositories/systemConfigRepository');
+var config = require('./config');
 
 
 var contextRoot = "/";  //Not set any contextRoot at the moment, but let's make it as easy to config
 
 mongoose.Promise = q.Promise;
-var envMongo = scr.getMongoEnv();
+var envMongo = config.mongo;
 var	mongoURL = 'mongodb://' + envMongo.user +
 				":" + envMongo.password +
 				'@' + envMongo.host +
@@ -56,7 +56,7 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort('8003');
+var port = normalizePort('8010');
 app.set('port', port);
 
 /**

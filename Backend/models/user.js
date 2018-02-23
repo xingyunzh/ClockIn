@@ -4,13 +4,15 @@ var Schema = mongoose.Schema;
 var userSchema = Schema({
 	nickname:String,
 
-	uid:String,
+	openid:String,
 
 	headImgUrl:String,
 
-	credits:{
-		type:Number,
-		default:206
+	tel:String,
+
+	ledger:{
+		type:Schema.Types.ObjectId,
+		ref:'Ledger'
 	}
 });
 

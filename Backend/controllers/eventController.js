@@ -1,36 +1,33 @@
 var eventRepository= require('../repositories/eventRepository');
 var userRepository = require('../repositories/userRepository');
-var CamproError = require('../models/CamproError');
+
 var util = require('../util/util');
 var q = require('q');
 
 exports.createEvent = function(req,res){
 
 	var userId = req.token.userId;
-	var deposit = req.body.deposit;
 
-	if(!util.checkParam(req.body,['location','time','deposit'])){
+	var event = req.body;
+
+	if(!util.checkParam(event,['checkType','theTime'])){
 		res.send(util.wrapBody('Invalid Parameters'),'E');
-
-	}else{
-		var event = {
-			description:req.body.description,
-			location:req.body.location,
-			theTime:req.body.time,
-			creator : userId
-		}
-
-		eventRepository.create(event).then(function(result){
-			return eventRepository.findById(result._id);
-		}).then(function(ne){
-			return join(ne._id,userId,deposit);
-		}).then(function(newEvent){
-			res.send(util.wrapBody({event:newEvent}));
-		}).catch(function(err){
-			console.log(err);
-			res.send(util.wrapBody('Internal Error','E'));
-		});
+		return;
 	}
+
+	event.creator = userId;
+	event.state = 'inProgress';
+	event.code = '1234';
+
+	eventRepository.create(event).then(function(result){
+		return eventRepostory.findById(result._id);
+	}).then(function(newIdea){
+		res.send(util.wrapBody({event:newIdea}));
+	}).catch(function(err){
+		console.log(err);
+		res.send(util.wrapBody('Internal Error','E'));
+	});
+
 };
 
 exports.getRefund = function(req,res) {
@@ -53,7 +50,7 @@ exports.getRefund = function(req,res) {
 	}).then(function(user){
 		res.send(util.wrapBody({user:user}));
 	}).catch(function(err){
-		if (typeof err == 'CamproError') {
+		if (typeof err == String) {
 			res.send(util.wrapBody(err,'E'));
 		} else {
 			console.log(err);
@@ -65,19 +62,24 @@ exports.getRefund = function(req,res) {
 exports.clockIn = function(req,res){
 	var userId = req.token.userId;
 	var eventId = req.params.id;
+	var code = req.params.code;
 
 	eventRepository.findById(eventId).then(function getEvent(event) {
-		for (p of event.participations) {
-			if (p.user._id == userId) {
-				p.state = 'clocked-in';
-				return eventRepository.updateById(eventId,{
-					participations:event.participations
-				});
-				break;
+		if (code != '1234') {
+			res.send(util.wrapBody('Clock In Fail','E'));
+		}else {
+			for (p of event.participations) {
+				if (p.user._id == userId) {
+					return participationRepository.updateById(p._id,{
+						state:'clockedIn'
+					});
+					break;
+				}
 			}
 		}
-	}).then(reCaculateRefundForEvent)
-	.then(function(result){
+	}).then(function() {
+		return eventRepository.findById(eventId).then(reCaculateRefundForEvent);
+	}).then(function(result){
 		res.send(util.wrapBody({event:result}));
 	}).catch(function(err){
 		if (typeof err == String) {
@@ -116,46 +118,37 @@ exports.cancelEvent = function(req,res){
 	});
 };
 
-function join(eventId,userId,deposit){
-	var participation = {
-		user:userId,
-		state:'normal',
-		deposit:deposit
-	};
-
-	return eventRepository.findById(eventId)
-	.then(function checkEventState(event) {
-		if (event.theTime < new Date()) {
-			throw new CamproError('Event Expiried');
-			// res.send(util.wrapBody('Event Expiried','E'));
-		}else {
-
-			return userRepository.updateById(userId,{
-				$inc:{
-					credits: -deposit
-				}
-			}).then(function() {
-				return eventRepository.updateById(eventId,{
-					$push:{
-						participations:participation
-					}
-				})
-			})
-		}
-	})
-}
-
 exports.joinEvent = function(req,res){
 	var userId = req.token.userId;
 	var eventId = req.params.id;
 
 	var deposit = req.body.deposit;
 
-	join(eventId,userId,deposit)
+	var participation = {
+		user:userId,
+		state:'normal',
+		deposit:deposit
+	};
+
+	eventRepository.findByid(eventId)
+	.then(function checkEventState(event) {
+		if (event.theTime < Date.now()) {
+			res.send(util.wrapBody('Event Expiried','E'));
+		}else {
+			return participationRepository.create(participation);
+		}
+	}).then(function addParticipationToEvent(participation) {
+		return eventRepository.updateById(eventId,{
+			$push:{
+				participations:participation._id
+			}
+		});
+	})
+	// .then(reCaculateRefundForEvent)
 	.then(function(result){
 		res.send(util.wrapBody({event:result}));
 	}).catch(function(err){
-		if (typeof err == 'CamproError') {
+		if (typeof err == String) {
 			res.send(util.wrapBody(err,'E'));
 		} else {
 			console.log(err);
@@ -167,36 +160,29 @@ exports.joinEvent = function(req,res){
 var reCaculateRefundForEvent = function(event) {
 	var promises = [];
 
-	var depositForRefund = event.initialDeposit;
-	var winnersDeposit = 0;
+	var losersDeposit = event.initialDeposit;
+	var winnersDeposit = event.initialDeposit;
 
 	for (p of event.participations) {
 		if (p.state == 'normal') {
-			depositForRefund = depositForRefund + p.deposit;
-		}else if (p.state == 'clocked-in') {
+			losersDeposit = losersDeposit + p.deposit;
+		}else if (p.state == 'clockedIn') {
 			winnersDeposit = winnersDeposit + p.deposit;
 		}
 	}
 
-	if(winnersDeposit == 0){
-		return eventRepository.findById(event._id);
-	}else{
-		for (p of event.participations) {
+	for (p of event.participations) {
 
-			if (p.state == 'normal') {
-				p.refund = 0;
+		var promise = participationRepository.updateById(p._id,{
+			refund:losersDeposit * p.deposit / winnersDeposit
+		});
 
-			}else if (p.state == 'clocked-in') {
-				p.refund = depositForRefund * p.deposit / winnersDeposit
-
-			}
-		}
-
-		return eventRepository.update(event._id,{
-			participations:event.participations
-		})
+		promises.push(promise);
 	}
 
+	return q.all(promises).then(function(){
+		return eventRepository.findById(event._id);
+	});
 }
 
 exports.updateEvent = function(req,res){
@@ -230,24 +216,17 @@ exports.updateEvent = function(req,res){
 exports.listEventsByUser = function(req,res){
 
 	var userId = req.token.userId;
-	var pageNum = req.query.pageNum;
 
-	var conditions = {
-		related : req.token.userId,
-		sort : '-createDate',
-		pageSize : 10,
-		pageNum : pageNum
-	}
+	var conditions = req.body;
+	conditions.user = req.token.userId;
+	conditions.sort = 'createDate';
+	conditions.pageSize = 100;
 
-
-	eventRepository.query(conditions).then(function(result){
-		return checkEvents(result.list).then(function(){
-			res.send(util.wrapBody({
-				total:result.total,
-				events:result.list
-			}));
-		});
-
+	participationRepository.query(conditions).then(function(result){
+		res.send(util.wrapBody({
+			total:result.total,
+			events:result.list
+		}));
 	}).catch(function(err){
 		if (typeof err == String) {
 			res.send(util.wrapBody(err,'E'));
@@ -256,31 +235,25 @@ exports.listEventsByUser = function(req,res){
 			res.send(util.wrapBody('Internal Error','E'));
 		}
 	});
+
 };
-
-function checkEvents(events){
-	var changedCount = 0;
-	var promises = [];
-
-	for (var event of events) {
-
-		if(event.state == 'in-progress' && event.theTime <= new Date()){
-			event.state = 'over'
-			promises.push(eventRepository.updateById(event._id,event));
-		}
-	}
-
-	return q.all(promises);
-}
-
 
 exports.getEventById = function(req,res){
 	var eventId = req.params.id;
 
 	var event = {};
 
-	eventRepository.findById(eventId).then(function(event){
+	eventRepostory.findById(eventId).then(function(result){
+		event = result;
 
+		var conditions = {
+			event:result._id,
+			pageSize:100
+		};
+
+		return participationRepository.query(conditions);
+	}).then(function(result){
+		event.participants = result;
 		res.send(util.wrapBody({event:event}));
 
 	}).catch(function(err){

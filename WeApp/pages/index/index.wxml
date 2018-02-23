@@ -1,41 +1,19 @@
 <!--index.wxml-->
 <import src="/templates/eventCell/eventCell.wxml" />
 <view class="container">
-  <view class="control-panel">
-    <view class="info-panel">
-      <view class="user-avatar">
-        <image class="img-circle img-avatar" src="{{userInfo.avatarUrl}}"></image>
-      </view>
-      <view class="nickname-area">
-      {{userInfo.nickName}}
-      </view>
+  <view class="info-panel">
+
+
       <view class="credits-area">
-        <label class="credits-label">准点</label>
-        <view class="credits">{{user.credits}}</view>
+        <view class="credits">{{balance}}</view>
       </view>
-    </view>
-    <view class="weui-btn-area">
-      <button type="primary" bindtap="createEvent">发起准点到</button>
-    </view>
+
 
   </view>
-  <view class="list-panel">
-    <scroll-view scroll-top="{{scrollTop}}" scroll-y="true" class="list" bindscrolltolower="loadMore" bindscroll="scroll" bindscrolltoupper="refresh">
-      <view wx:if="{{events.length == 0}}">
-        <view class="weui-cell">
-          <view class="no-data">暂无数据</view>
-        </view>
-      </view>
-      <view wx:else>
-        <view wx:for="{{events}}" wx:key="item">
-          <view catchtap="viewEvent" data-id="{{item._id}}">
-            <template is="eventCell" data="{{...item}}" />
-          </view>
 
-        </view>
-      </view>
-
-    </scroll-view>
+  <view class="control-panel">
+    <button bindtap="goCreate">我要挑战</button>
   </view>
+
 
 </view>

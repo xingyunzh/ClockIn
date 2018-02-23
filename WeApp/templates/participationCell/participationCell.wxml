@@ -13,7 +13,7 @@
         Ta到了！
       </view>
     </view>
-    <view class="participation-deposit">{{deposit}}点</view>
+    <view class="participation-deposit">许诺{{deposit}}点</view>
   </view>
 
 </template>

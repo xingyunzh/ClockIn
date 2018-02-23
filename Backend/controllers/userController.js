@@ -1,276 +1,131 @@
-var userRepository = require('../repositories/userRepository');
-var uidAdapter = require('../authenticate/uidAdapter');
+var uuidv1 = require('uuid/v1')
 var util = require('../util/util');
-var stringHelper = require('../util/shared/stringHelper');
+var http = require('http');
+var crypto = require('crypto');
 var authenticator = require('../authenticate/authenticator');
+var WXBizDataCrypt = require('../util/WXBizDataCrypt');
+var userRepository = require('../repositories/userRepository');
+const ledgerRepository = require('../repositories/ledgerRepository');
+const wechatLoginAdapter = require('./wechatLoginAdapter');
+const config = require('../config');
+
 var q = require('q');
-var CamproError = require('../models/CamproError');
-
-
-exports.registerUserByWeApp = function(req,res){
-	if (!util.checkParam(req.body,['sessionId','encryptedData','iv'])) {
-		res.send(util.wrapBody('Invalid Parameter','E'));
-	}else{
-		var deferred = q.defer();
-		uidAdapter.registerByWeApp('clockin',req.body.sessionId,req.body.encryptedData,req.body.iv,function(err,result){
-			if (err) {
-				deferred.reject(err);
-			}else{
-				deferred.resolve(result);
-			}
-		});
-
-		var u;
-
-		deferred.promise.then(function(result){
-
-			var newUser = {
-				uid:result.user._id,
-				headImgUrl:result.user.headImgUrl,
-				nickname:result.user.nickname
-			};
-
-			return userRepository.create(newUser);
-		}).then(function generateToken(user){
-			u = user;
-			return authenticator.create(user._id);
-		}).then(function sendResponse(token){
-			res.setHeader('set-token',token);
-
-			var responseBody = {
-				user:u
-			};
-
-			res.send(util.wrapBody(responseBody));
-		}).catch(function(err){
-			console.log(err);
-			res.send(util.wrapBody('Internal Error','E'));
-		});;
-	}
-}
 
 exports.loginByWeApp = function(req,res){
+  // console.log("inside login by weapp")
 	if (!util.checkParam(req.body,['code'])) {
 		res.send(util.wrapBody('Invalid Parameter','E'));
 	}else{
-		var code = req.body.code;
 
-		var deferred = q.defer();
-		uidAdapter.loginByWeApp(code,'clockin',function(err,result){
-			if (err) {
-				deferred.reject(err);
-			}else{
-				deferred.resolve(result);
-			}
-		});
+		var uid = uuidv1();
+    // console.log("have code",req.body)
+    // console.log(wechatLoginAdapter.viaWeapp)
+		wechatLoginAdapter
+		.viaWeapp(req.body.code)
+		.then(function(session){
+      console.log("session:",session)
+			return userRepository.findByOpenid(session.openid)
+      .then(function(user){
+				if(!!user){
+          console.log('user',user);
+					sessionKeyCache[user.id] = session;
+					authenticator.create(user._id)
+					.then(function sendResponse(token){
+						res.setHeader('set-token',token);
 
-		deferred.promise.then(function(result){
-			console.log(result);
-
-			if(result.shouldGetPrivateUserInfo){
-				var responseBody = {
-					sessionId:result.sessionId,
-					shouldGetPrivateUserInfo:true
-				};
-
-				res.send(util.wrapBody(responseBody));
-
-			}else{
-				var user = result.user;
-				var u;
-
-				return userRepository
-				.findByUid(user._id)
-				.then(function(userResult){
-					if(userResult == null){
-
-						var newUser = {
-							uid:user._id,
-							headImgUrl:user.headImgUrl,
-							nickname:user.nickname
+						var responseBody = {
+							token:token,
+							user:user
 						};
 
-						return userRepository.create(newUser);
-					}else{
-						return userResult;
-					}
-				}).then(function generateToken(user){
-					u = user;
-					console.log(u);
-					return authenticator.create(user._id);
-				}).then(function sendResponse(token){
-					res.setHeader('set-token',token);
-
-					var responseBody = {
-						user:u,
-					};
-
-					res.send(util.wrapBody(responseBody));
-				});
-			}
+						res.send(util.wrapBody(responseBody));
+					})
+				}else{
+					sessionKeyCache[uid] = session;
+					res.send(util.wrapBody({
+						shouldGetPrivateUserInfo:true,
+						sessionId:uid
+					}))
+				}
+			});
 		}).catch(function(err){
-			console.log(err);
-			res.send(util.wrapBody('Internal Error','E'));
-		});
-
-	}
-};
-
-exports.update = function(req,res){
-	var id = req.token.userId;
-
-	userRepository.updateById(id, req.body).then(function(result){
-        res.send(util.wrapBody(result));
-    }).catch(function(err){
-        console.log(err);
-        res.send(util.wrapBody('Internal Error','E'));
-    });
-};
-
-exports.getProfileById = function(req,res){
-	var userId = req.params.id;
-
-  userRepository.findById(id).then(function(result){
-      var responseBody = {
-          user:result
-      };
-      res.send(util.wrapBody(responseBody));
-  }).catch(function(err){
       console.log(err);
       res.send(util.wrapBody('Internal Error','E'));
-  });
+    });
+	}
 };
 
-exports.getProfile = function(req,res){
-	var userId = req.token.userId;
+//TODO use redis to instead
+var sessionKeyCache = {}
 
-	userRepository.findById(userId).then(function(result){
-			var responseBody = {
-					user:result
-			};
-			res.send(util.wrapBody(responseBody));
-	}).catch(function(err){
-			console.log(err);
-			res.send(util.wrapBody('Internal Error','E'));
-	});
+function decryptData(encryptedData,iv,sessionKey){
+	var pc = new WXBizDataCrypt(config.appID, sessionKey);
+	var data = pc.decryptData(encryptedData,iv);
+	return data;
 }
 
-exports.listUser = function(req,res){
-	var conditions = req.query;
-
-	userRepository
-	.query(conditions)
-	.then(function(result){
-		res.send(util.wrapBody({
-			total:result.total,
-			users:result.list
-		}));
-	}).catch(function(err){
-		console.log(err);
-		if (err instanceof CamproError) {
-			res.send(util.wrapBody(err.customMsg,'E'));
-		} else {
-			res.send(util.wrapBody('Internal Error','E'));
-		}
-	});
-};
-
-function login(req,res,type){
-	var isFirstTimeLogin = false;
-
-	var deferred = q.defer();
-	if (type == 'email') {
-		var email = req.body.email;
-		var	password = req.body.password;
-
-		uidAdapter.loginByEmail(email,password,function(err,result){
-			if (err) {
-				deferred.reject(err);
-			}else{
-				deferred.resolve(result);
-			}
-		});
-	}else if(type == 'wechat'){
-		var code = req.body.code;
-		uidAdapter.loginByWechat(code,'clockin',function(err,result){
-			if (err) {
-				deferred.reject(err);
-			}else{
-				deferred.resolve(result);
-			}
-		});
-	}else if(type == 'weapp'){
-		var code = req.body.code;
-		uidAdapter.loginByWechat(code,'clockin',function(err,result){
-			if (err) {
-				deferred.reject(err);
-			}else{
-				deferred.resolve(result);
-			}
-		});
+exports.decryptData = function(req,res){
+	console.log('inside decrypt data',req.body)
+	if(!util.checkParam(req.body,['userId','encryptedData','iv'])){
+		res.send(util.wrapBody('Invalid Parameter','E'));
 	}else{
-		console.log('Invalid Type:',type);
-		deferred.reject(new Error('Internal Error'));
+		var session = sessionKeyCache[req.body.userId]
+		console.log(session)
+		if('undefined' === typeof session){
+			res.send(util.wrapBody('Invalid Parameter','E'));
+		}else{
+			var data = decryptData(req.body.encryptedData,req.body.iv,session.session_key)
+
+			res.send(util.wrapBody(data))
+		}
 	}
+}
 
-	deferred.promise.then(function getProfile(result){
-		var user = result.user;
+exports.registerUserByWeApp = function(req,res){
 
-		if (!user) {
-			return null;
-		}
-
-		return userRepository
-		.findByUid(user._id)
-		.then(function(userResult){
-			if(userResult == null){
-				isFirstTimeLogin = true;
-				//return importProfile(user);
-				var newUser = {
-					uid:user._id,
-					headImgUrl:user.headImgUrl,
-					roles:['player']
-				};
-
-				if (!!user.nickname) {
-					newUser.nickname = user.nickname;
-				} else {
-					newUser.nickname = '新用户' + stringHelper.randomString(4,'all');
-				}
-
-				return userRepository.create(newUser);
+	if(!util.checkParam(req.body,['sessionId','encryptedData','iv'])){
+		res.send(util.wrapBody('Invalid Parameter','E'));
+	}else{
+		var session = sessionKeyCache[req.body.sessionId];
+		if('undefined' === typeof session){
+			res.send(util.wrapBody('Invalid Parameter','E'));
+		}else{
+			var u;
+			var data = decryptData(req.body.encryptedData,req.body.iv,session.session_key)
+      console.log("decrypted data:",data);
+			if(!data.openId){
+        res.send(util.wrapBody('Decrypt fail','E'));
 			}else{
-				return userResult;
-			}
-		});
-	}).then(function generateToken(user){
-		if (!user) {
-			return null;
+        ledgerRepository.create()
+        .then(function(ledger){
+          console.log('ledger',ledger);
+          var newUser = {
+            nickname:data.nickName,
+            openid:session.openid,
+            headImgUrl:data.avatarUrl,
+            ledger:ledger
+          }
+          return userRepository.create(newUser)
+        }).then(function createToken(user){
+				   u = user;
+					 sessionKeyCache[user.id] = session;
+					 // delete session
+				   return authenticator.create(user.id);
+			  }).then(function sendResponse(token){
+
+          res.setHeader('set-token',token);
+
+  				var responseBody = {
+  					token:token,
+  					user:u
+  				};
+
+  				res.send(util.wrapBody(responseBody));
+  			}).catch(function(err){
+  				console.log(err);
+  				res.send(util.wrapBody('Internal Error','E'));
+  			});
+      }
 		}
-
-		var deferred = q.defer();
-
-		authenticator.create(user._id,function(err,newToken){
-			if (err) {
-				deferred.reject(err);
-			}else{
-				res.setHeader('set-token',newToken);
-				deferred.resolve(user);
-			}
-		});
-
-		return deferred.promise;
-	}).then(function sendResponse(user){
-
-		var responseBody = {
-			user:user,
-			isFirstTimeLogin:isFirstTimeLogin
-		};
-
-		res.send(util.wrapBody(responseBody));
-	}).catch(function(err){
-		console.log(err);
-		res.send(util.wrapBody('Internal Error','E'));
-	});
-
+	}
 }

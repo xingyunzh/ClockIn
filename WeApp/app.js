@@ -1,67 +1,75 @@
 //app.js
-var network = require('./utils/network')
+let User = require('/resources/user')
+
 App({
   onLaunch: function () {
-    //调用API从本地缓存中获取数据
-    var logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
 
-    // this.init()
   },
-  init: function (callback) {
-    if (!!this.globalData.user) {
-      callback(null, this.globalData.user)
-    } else {
-      var that = this
-      wx.checkSession({
-        success: function () {
-          wx.getStorageInfo({
-            success: function (res) {
-              console.log(res)
-              if (res.keys.indexOf('token') > -1) {
-                network.getCredit(that.cacheUser, callback)
-              } else {
-                network.login(that.cacheUser, callback)
-              }
-            },
-          })
-        },
-        fail: function () {
-          network.login(that.cacheUser, callback)
-        }
-      })
-    }
-  },
-  cacheUser: function (err, user, callback) {
-    if (err) {
-      callback(err)
-    } else {
-      this.globalData.user = user
-      callback(null, user)
-    }
-  },
-  getUserInfo: function (cb) {
-    var that = this
-    if (this.globalData.userInfo) {
-      typeof cb == "function" && cb(this.globalData.userInfo)
-    } else {
-      wx.getUserInfo({
-        withCredentials: false,
-        success: function (res) {
-          console.log(res);
-          that.globalData.userInfo = res.userInfo
-          typeof cb == "function" && cb(that.globalData.userInfo)
-        },
-        fail: function (err) {
-          console.log(err)
-        }
-      })
 
-    }
+  onShow: (options) => {
+    console.log(options)
   },
-  globalData: {
-    userInfo: null,
-    user: null
-  }
+  
+  auth: (callback) => {
+    let cacheUser = (err, res) => {
+      if (err) {
+        console.log("login fail:", err);
+        wx.showToast({
+          title: '登录失败',
+        })
+        callback(null)
+      } else {
+        let user = res
+        // Logger.addLog('login', 'userId:' + user.id)
+        wx.setStorage({
+          key: 'user',
+          data: user,
+          success: (res) => {
+            console.log("store success:", res);
+            console.log('user stored in auth')
+            callback(user)
+          },
+          fail: (err) => {
+            console.log("store fail:", err);
+            wx.showToast({
+              title: '登录失败',
+            })
+            callback(null)
+          }
+        })
+      }
+    }
+
+    wx.checkSession({
+      success: () => {
+        wx.getStorageInfo({
+          success: (res) => {
+            // console.log(res)
+            if (res.keys.indexOf('token') > -1 && res.keys.indexOf('user') > -1) {
+              wx.getStorage({
+                key: 'user',
+                success: (res) => {
+                  callback(res.data);
+                },
+                fail: () => {
+                  wx.hideLoading()
+                  wx.showLoading({
+                    title: '正在登陆',
+                  })
+                  User.login(cacheUser)
+                }
+              })
+            } else {
+              User.login(cacheUser)
+            }
+          },
+        })
+      },
+      fail: () => {
+        User.login(cacheUser)
+      }
+    })
+  },
+
+
 })

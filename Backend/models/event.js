@@ -5,10 +5,10 @@ var eventSchema = Schema({
 
 	state:{
 		type:String,
-		default:'in-progress' //normal, cancelled
+		default:'in_progress' //in_progress, cancelled, success, fail
 	},
 
-	description:String,
+	condition:String,
 
 	creator:{
 		type:Schema.Types.ObjectId,
@@ -22,39 +22,28 @@ var eventSchema = Schema({
 		default:new Date()
 	},
 
-	participations:[{
-		user:{
-			type:Schema.Types.ObjectId,
-			ref:'User'
-		},
-
-		state:String,//normal, clockedIn
-
-		deposit:Number,
-
-		refund:{
-			type:Number,
-			default:0
-		}
-	}],
-
-	initialDeposit:{
+	deposit:{
 		type:Number,
 		default:0
 	},
 
+	witnesses:[{
+		type:Schema.Types.ObjectId,
+		ref:'User'
+	}],
+
+	followers:[{
+		type:Schema.Types.ObjectId,
+		ref:'User'
+	}],
+
 	theTime:Date,
 
-	location:{
-		address:String,
-		name:String,
-		longitude:Number,
-		latitude:Number,
-	}
+	longitude:Number,
 
-	// checkInCode:String,
+	latitude:Number,
 
-	// checkType:String //'LBS','QR'
+	checkType:String //'LBS','normal'
 });
 
 var Event = mongoose.model('Event', eventSchema);

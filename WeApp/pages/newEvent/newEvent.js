@@ -53,6 +53,7 @@ Page({
   createEvent: function () {
     console.log('created');
     var newEvent = {
+      deposit:1,
       description: this.data.description,
       location: this.data.location,
       time: this.data.date + " " + this.data.time,

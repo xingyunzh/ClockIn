@@ -1,59 +1,41 @@
 //index.js
 //获取应用实例
-var util = require('../../utils/util')
-var network = require('../../utils/network')
-var app = getApp()
+let util = require('../../utils/util')
+let app = getApp()
 Page({
   data: {
     user:{},
     userInfo:{},
+    balance:0,
     scrollTop : 0,
     scrollHeight:0,
     events:[],
     currentPage:0,
     isLoadingData:true
   },
-  onShow: function (){
-    var that = this
-    //调用应用实例的方法获取全局数据
-    app.init(function(err,user){
-      if(err){
-        console.log(err)
-      }else{
-        that.setData({
-          user:user
-        })
-      }
-    })
-    app.getUserInfo(function (userInfo) {
-      //更新数据
-      console.log(userInfo)
-      that.setData({
-        userInfo: userInfo
-      })
-    })
 
-    network.getEvents(0, function (err, events) {
-      if (err) {
-        console.log(err)
-      } else {
-        that.setData({
-          events: events,
-          currentPage: 0
-        })
-      }
+  onLoad: function () {
+    app.auth((user) => {
+      console.log(user)
+      this.setData({
+        user:user,
+        balance:0
+      })
+
     })
   },
-  onLoad: function () {
-    console.log('onLoad')
-    
+
+  onShow: function () {
+    var that = this
+    //调用应用实例的方法获取全局数据
+
   },
 
 
   //事件处理函数
-  createEvent: function(event){
+  goCreate: function(event){
     wx.navigateTo({
-      url: '/pages/newEvent/newEvent',
+      url: '/pages/newEvent/index',
       success: function(res){
         // success
       }

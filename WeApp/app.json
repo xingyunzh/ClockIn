@@ -1,8 +1,8 @@
 {
   "pages":[
     "pages/index/index",
+    "pages/list/index",
     "pages/event/event",
-    "pages/login/login",
     "pages/newEvent/newEvent",
     "pages/logs/logs"
   ],
@@ -11,5 +11,21 @@
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "准点到哦",
     "navigationBarTextStyle":"black"
+  },
+  "tabBar": {
+    "color":"#999999",
+    "selectedColor":"#ed2c4a",
+    "backgroundColor":"#F7F7FA",
+    "list": [{
+      "pagePath": "pages/index/index",
+      "text": "我的",
+      "iconPath": "/srcs/images/my_deselected.png",
+      "selectedIconPath": "/srcs/images/my_selected.png"
+    },{
+      "pagePath": "pages/index/index",
+      "text": "挑战",
+      "iconPath": "/srcs/images/challenge_deselected.png",
+      "selectedIconPath": "/srcs/images/challenge_selected.png"
+    }]
   }
 }

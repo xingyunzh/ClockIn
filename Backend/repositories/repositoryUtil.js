@@ -1,4 +1,23 @@
-var CamproError = require('../models/CamproError');
+
+
+exports.buildSearchRegExp = function(string){
+	var alphabet = exports.alphabetize(string,{
+		separator:'|'
+	});
+
+	var exp = "";
+
+	if (alphabet.indexOf('|') == -1) {
+		for(var i in alphabet){
+			exp = exp + alphabet[i] + "[A-Za-z0-9\\|]*";
+		}
+	}else{
+		exp = alphabet.replace('|','\\|');
+	}
+
+	return RegExp(exp,'i');
+};
+
 
 exports.paging = function(model,conditions,options,population) {
 	var totalCount = null;

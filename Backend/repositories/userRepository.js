@@ -1,17 +1,16 @@
 var User = require('../models/user.js');
 var repositoryUtil = require('./repositoryUtil');
 
-exports.findByUid = function(uid) {
-	return User.findOne({uid:uid}).lean().exec();
+exports.findByOpenid = function(openid) {
+	return User.findOne({openid:openid}).populate('ledger').lean().exec();
 };
 
 exports.findById = function(id){
-	return User.findById(id).lean().exec();
+	return User.findById(id).populate('ledger').lean().exec();
 };
 
 exports.create = function(data){
-
-	return User.create(data);
+	return User.create(data).populate('ledger');
 };
 
 exports.updateById = function(id,data){
