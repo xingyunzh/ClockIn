@@ -1,0 +1,32 @@
+/* pages/create/index.wxss */
+
+.clickable{
+  color: blue;
+}
+
+.pickers{
+  height: 60rpx;
+  line-height: 60rpx;
+  /* margin-left: auto;
+  margin-right: auto;
+  width: 600rpx; */
+  display: flex;
+  justify-content: center;
+}
+
+.date-picker{
+  border-right:1px black solid;
+  padding-right: 25rpx;
+}
+
+.time-picker{
+  margin-left: 25rpx;
+}
+
+.event-condition-panel,.event-location-panel,.red_packet-deposit-panel,.red_packet-max-panel{
+  display: flex;
+}
+
+.event-condition-panel input{
+  border-bottom: 1px solid black;
+}

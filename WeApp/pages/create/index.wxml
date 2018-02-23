@@ -1,0 +1,56 @@
+<view>
+  <view class='event-form'>
+    <view class='event-time-panel'>
+      <label>目标时间</label>
+      <view class='pickers'>
+        <picker bindchange='dateChange' start="{{start}}" mode="date" value='{{date}}'>
+          <view class='date-picker'>{{date}}</view>
+        </picker>
+        <picker bindchange='timeChange' mode="time" value='{{time}}'>
+          <view class='time-picker'>{{time}}</view>
+        </picker>
+      </view>
+
+    </view>
+    <view class='event-location-switch'>
+      <view hidden="{{eventType == 'normal'}}">目前为目的地挑战，
+        <span class="clickable" catchtap="changeTypeNormal">改为普通挑战</span>
+      </view>
+      <view hidden="{{eventType == 'LBS'}}">目前为普通挑战，
+        <span class="clickable" catchtap="changeTypeLBS">改为目的地挑战</span>
+      </view>
+    </view>
+    <view hidden="{{eventType == 'normal'}}" class='event-location-panel'>
+      <label>目的地</label>
+      <label class="clickable" catchtap='locate'>{{location.name}}</label>
+    </view>
+    <view hidden="{{eventType == 'LBS'}}" class='event-condition-panel'>
+      <label>目标</label>
+      <input type='text' maxlength='20'></input>
+    </view>
+  </view>
+  <view class='red_packet-swtich'>没有把握挑战成功，哼哼，您也可以
+    <span catchtap="redPacketSwitch" class="clickable">不发红包</span>
+  </view>
+
+  <view hidden='{{noDeposit}}' class='red_packet-form'>
+    <view class='red_packet-max-panel'>
+      <label>红包人数上限</label>
+      <picker mode="selector" bindchange='maxChange' value='{{max}}' range='{{[1,2,3,4,5,6]}}'>
+        <view>{{max}}</view>
+      </picker>
+    </view>
+    <view class='red_packet-deposit-panel'>
+      <label>红包总金额</label>
+      <radio-group>
+        <radio>1</radio>
+        <radio>6</radio>
+        <radio>16</radio>
+        <radio>66</radio>
+      </radio-group>
+    </view>
+  </view>
+  <view>
+    <button>挑战确认</button>
+  </view>
+</view>

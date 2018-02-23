@@ -18,6 +18,11 @@ var ledgerSchema = Schema({
 		default:0
 	},
 
+	lost:{
+		type:Number,
+		default:0
+	},
+
   actions:[{
 		type:Schema.Types.ObjectId,
 		ref:'Action'

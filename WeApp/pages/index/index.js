@@ -1,11 +1,10 @@
 //index.js
 //获取应用实例
-let util = require('../../utils/util')
+let User = require('../../resources/user.js')
 let app = getApp()
 Page({
   data: {
     user:{},
-    userInfo:{},
     balance:0,
     scrollTop : 0,
     scrollHeight:0,
@@ -16,12 +15,7 @@ Page({
 
   onLoad: function () {
     app.auth((user) => {
-      console.log(user)
-      this.setData({
-        user:user,
-        balance:0
-      })
-
+      this.handleUserData(user)
     })
   },
 
@@ -31,52 +25,32 @@ Page({
 
   },
 
+  onPullDownRefresh:function(){
+    User.getUserById(this.data.user.id,function(err,user){
+      if(err){
+        console.log(err)
+      }else{
+        this.handleUserData(user)
+      }
+    })
+  },
+
+  handleUserData:function(user){
+    let ledger = user.ledger
+    this.setData({
+      user: user,
+      balance: ledger.gained + ledger.paid - ledger.recharged - ledger.lost
+    })
+  },
 
   //事件处理函数
   goCreate: function(event){
     wx.navigateTo({
-      url: '/pages/newEvent/index',
+      url: '/pages/create/index',
       success: function(res){
         // success
       }
     })
-  },
-  viewEvent:function(event){
-    var id = event.currentTarget.dataset.id
-
-    wx.navigateTo({
-      url: '/pages/event/event?id=' + id,
-      success: function(res){
-        // success
-      }
-    })
-  },
-  scroll:function(){
-
-  },
-  loadMore:function(){
-    console.log('load more')
-    if(!this.data.isLoadingData){
-      var that = this
-      this.setData({
-        currentPage: this.data.currentPage + 1,
-        isLoadingMore: true
-      })
-      network.getEvents(this.data.currentPage, function (err, events) {
-        if (events.length == 0) {
-          console.log('no more')
-          that.setData({
-            currentPage: this.data.currentPage - 1,
-            isLoadingMore:false
-          })
-        } else {
-          that.setData({
-            events: that.data.events.concat(events),
-            isLoadingMore: false
-          })
-        }
-      })
-    }
-    
   }
+
 })

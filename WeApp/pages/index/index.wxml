@@ -1,18 +1,18 @@
 <!--index.wxml-->
-<import src="/templates/eventCell/eventCell.wxml" />
+
 <view class="container">
   <view class="info-panel">
 
-
-      <view class="credits-area">
-        <view class="credits">{{balance}}</view>
-      </view>
+    <view class="credits-area">
+      <view class="balance">{{balance}}</view>
+    </view>
 
 
   </view>
 
   <view class="control-panel">
-    <button bindtap="goCreate">我要挑战</button>
+    <button catchtap="goCreate">我要挑战</button>
+    <button disabled='true' catchtap="goCreate">我要充值</button>
   </view>
 
 

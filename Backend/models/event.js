@@ -10,6 +10,8 @@ var eventSchema = Schema({
 
 	condition:String,
 
+	location:{},
+
 	creator:{
 		type:Schema.Types.ObjectId,
 		ref:'User',
@@ -27,6 +29,11 @@ var eventSchema = Schema({
 		default:0
 	},
 
+	max:{
+		type:Number,
+		default:1
+	}
+
 	witnesses:[{
 		type:Schema.Types.ObjectId,
 		ref:'User'
@@ -37,11 +44,10 @@ var eventSchema = Schema({
 		ref:'User'
 	}],
 
-	theTime:Date,
-
-	longitude:Number,
-
-	latitude:Number,
+	theTime:{
+		type:Date,
+		required:true
+	},
 
 	checkType:String //'LBS','normal'
 });

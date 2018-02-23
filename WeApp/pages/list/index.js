@@ -43,6 +43,43 @@ Page({
   
   },
 
+  viewEvent: function (event) {
+    var id = event.currentTarget.dataset.id
+
+    wx.navigateTo({
+      url: '/pages/event/event?id=' + id,
+      success: function (res) {
+        // success
+      }
+    })
+  },
+
+  loadMore: function () {
+    console.log('load more')
+    if (!this.data.isLoadingData) {
+      var that = this
+      this.setData({
+        currentPage: this.data.currentPage + 1,
+        isLoadingMore: true
+      })
+      network.getEvents(this.data.currentPage, function (err, events) {
+        if (events.length == 0) {
+          console.log('no more')
+          that.setData({
+            currentPage: this.data.currentPage - 1,
+            isLoadingMore: false
+          })
+        } else {
+          that.setData({
+            events: that.data.events.concat(events),
+            isLoadingMore: false
+          })
+        }
+      })
+    }
+
+  },
+
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */

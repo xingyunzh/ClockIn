@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/list/index",
     "pages/event/event",
+    "pages/create/index",
     "pages/newEvent/newEvent",
     "pages/logs/logs"
   ],

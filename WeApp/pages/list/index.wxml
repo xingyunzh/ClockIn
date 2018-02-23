@@ -1,2 +1,3 @@
 <!--pages/list/index.wxml-->
+<import src="/templates/eventCell/eventCell.wxml" />
 <text>pages/list/index.wxml</text>

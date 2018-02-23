@@ -2,9 +2,9 @@ var uuidv1 = require('uuid/v1')
 var util = require('../util/util');
 var http = require('http');
 var crypto = require('crypto');
-var authenticator = require('../authenticate/authenticator');
-var WXBizDataCrypt = require('../util/WXBizDataCrypt');
-var userRepository = require('../repositories/userRepository');
+const authenticator = require('../authenticate/authenticator');
+const WXBizDataCrypt = require('../util/WXBizDataCrypt');
+const userRepository = require('../repositories/userRepository');
 const ledgerRepository = require('../repositories/ledgerRepository');
 const wechatLoginAdapter = require('./wechatLoginAdapter');
 const config = require('../config');
@@ -106,6 +106,8 @@ exports.registerUserByWeApp = function(req,res){
             ledger:ledger
           }
           return userRepository.create(newUser)
+        }).then(function(user){
+          return userRepository.findById(user.id)
         }).then(function createToken(user){
 				   u = user;
 					 sessionKeyCache[user.id] = session;
@@ -128,4 +130,30 @@ exports.registerUserByWeApp = function(req,res){
       }
 		}
 	}
+}
+
+exports.update = function(req,res){
+  if(!util.checkParam(req.body,['id','updates'])){
+		res.send(util.wrapBody('Invalid Parameter','E'));
+	}else{
+    let id = req.body.id;
+    let updates = req.body.updates;
+    userRepository.updateById(id,updates).then(function(user){
+      res.send(util.wrapBody({user:user}));
+    }).catch(function(err){
+      console.log(err)
+      res.send(util.wrapBody('Internal Error','E'));
+    })
+  }
+
+}
+
+exports.getUserById = function(req,res){
+  let id = req.params.id;
+  userRepository.findById(id).then(function(user){
+    res.send(util.wrapBody({user:user}));
+  }).catch(function(err){
+    console.log(err)
+    res.send(util.wrapBody('Internal Error','E'));
+  })
 }

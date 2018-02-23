@@ -1,51 +1,18 @@
 /**index.wxss**/
 .control-panel {
-  height:20%;
+  height:60%;
 }
 
-.list{
-  height:100%
+
+.balance{
+  height: 300rpx;
+  font-size: 7em;
+  font-weight: lighter;
 }
 
 .info-panel{
-  line-height: 60rpx;
   height: 40%;
   margin-bottom: 50rpx;
 }
 
-.list-panel {
-  border-top:1rpx solid;
-  margin-top:5%;
-  height: 75%;
-}
 
-.user-avatar{
-  float: left;
-  height:70%;
-}
-
-.nickname-area{
-  margin-top: 50rpx;
-  float: left;
-}
-
-.credits-area{
-  width: 160rpx;
-  margin-top: 50rpx;
-  margin-right: 50rpx;
-  float: right;
-}
-
-.credits-label{
-  float: left;
-}
-
-.credits{
-  float: right;
-}
-
-.img-avatar{
-  margin: 50rpx;
-  width:60rpx;
-  height:60rpx;
-}
