@@ -42,15 +42,15 @@
     </view>
     <view class='red_packet-deposit-panel'>
       <label>红包总金额</label>
-      <radio-group>
-        <radio>1</radio>
-        <radio>6</radio>
-        <radio>16</radio>
-        <radio>66</radio>
+      <radio-group bindchange="amountChange">
+        <radio value='1' checked='true'>1</radio>
+        <radio value='6'>6</radio>
+        <radio value='16'>16</radio>
+        <radio value='66'>66</radio>
       </radio-group>
     </view>
   </view>
   <view>
-    <button>挑战确认</button>
+    <button catchtap='submitEvent'>挑战确认</button>
   </view>
 </view>

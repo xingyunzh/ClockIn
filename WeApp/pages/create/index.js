@@ -11,7 +11,7 @@ Page({
     start:null,
     eventType:'LBS',
     max:1,
-    deposit:null,
+    deposit:1,
     location:{
       name:'点击定位'
     }
@@ -48,6 +48,12 @@ Page({
   maxChange:function(event){
     this.setData({
       max: event.detail.value
+    })
+  },
+
+  amountChange:function(event){
+    this.setData({
+      deposit: event.detail.value
     })
   },
 
